@@ -1,0 +1,82 @@
+# Ignore Visual Studio temporary files, build results, and
+# Include /.vscode if you have settings in there for the project.
+.vscode/
+.vscode/*
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Auto-generated files
+*.log
+*.tlog
+*.idb
+
+# Backup & hidden folder
+$RECYCLE.BIN/
+
+# .NET Core directories
+bin/
+obj/
+
+# Visual Studio Code Workspace
+.vscode/
+
+# Visual Studio 2022
+.vs/
+
+# ASP.NET Scaffolding
+.scaffolding/
+
+# Entity Framework
+*.mdf
+*.ldf
+
+# SQL Server
+*.mdf
+*.ldf
+
+# NuGet Packages
+*.nupkg
+# The packages folder can be ignored if you're using NuGet package restore
+**/packages/
+# Uncomment if you have a packages folder for ASP.NET Core
+#packages/
+
+# Resharper files
+_ReSharper*/
+*.DotSettings.user
+
+# ASP.NET Specific
+project.lock.json
+project.fragment.lock.json
+artifacts/
+# Other cache files
+*.vspscc
+*.vssscc
+.idea/
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Environment settings
+appsettings*.json
+.env
+.env.*
+
+# Rider & Visual Studio Code
+.idea/
+.vscode/
+
+# Publish output
+.publish/
+
+# Logs
+logs/
+*.log
+
+# Visual Studio Code workspace and related
+.vscode/
