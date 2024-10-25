@@ -19,6 +19,11 @@ namespace Website_ASP.NET_Core_MVC.Controllers
             _context = context;
         }
 
+        public IActionResult SignUpPage()
+        {
+            return View();
+        }
+
         // GET: Customers
         public async Task<IActionResult> Index()
         {
