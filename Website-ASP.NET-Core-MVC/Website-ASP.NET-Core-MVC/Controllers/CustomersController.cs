@@ -19,10 +19,10 @@ namespace Website_ASP.NET_Core_MVC.Controllers
             _context = context;
         }
 
-        public IActionResult SignUpPage()
-        {
-            return View();
-        }
+        //public IActionResult SignUpPage()
+        //{
+        //    return View();
+        //}
 
         // GET: Customers
         public async Task<IActionResult> Index()
@@ -48,18 +48,18 @@ namespace Website_ASP.NET_Core_MVC.Controllers
             return View(customer);
         }
 
-        // GET: Customers/Create
-        public IActionResult Create()
+		// GET: Customers/SignUpPage
+		public IActionResult SignUpPage()
         {
             return View();
         }
 
-        // POST: Customers/Create
+        // POST: Customers/SignUpPage
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UserName,Email,Password,Phone,FullName,Gender,Date,Address")] Customer customer)
+        public async Task<IActionResult> SignUpPage([Bind("Id,UserName,Email,Password,Phone,FullName,Gender,Date,Address")] Customer customer)
         {
             if (ModelState.IsValid)
             {
