@@ -18,5 +18,6 @@ namespace Website_ASP.NET_Core_MVC.Models
 		public DateTime? Date { get; set; }
 		public string Address { get; set; }
 		public string? Image { get; set; }
+		public bool IsValid { get; set; }
     }
 }

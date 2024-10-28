@@ -30,7 +30,16 @@
 			</div>
 			<div class="form-group">
 				<label asp-for="Gender" class="control-label">Giới tính</label>
-				<input asp-for="Gender" class="form-control" placeholder="Nhập giới tính" />
+				<div>
+					<input type="radio" asp-for="Gender" id="genderNu" value="Nữ" />
+					<label for="genderNu" style="margin-right: 40px;">Nữ</label>
+
+					<input type="radio" asp-for="Gender" id="genderNam" value="Nam" />
+					<label for="genderNam" style="margin-right: 40px;">Nam</label>
+
+					<input type="radio" asp-for="Gender" id="genderKhac" value="Khác" />
+					<label for="genderKhac">Khác</label>
+				</div>
 				<span asp-validation-for="Gender" class="text-danger"></span>
 			</div>
 			<div class="form-group">
@@ -82,14 +91,13 @@
 		</div>
 	</div>
 
-	<div class="form-group">
-		<button type="submit" value="SignUpPage" class="btn btn-primary">Đăng ký</button>
-		@* <input type="submit" value="Đăng ký" class="btn btn-primary" /> *@
+	<div class="form-group" style="display: flex; justify-content: center;" >
+		<button type="submit" value="SignUpPage" class="sign-up-button" id="SignUpButton">Đăng ký</button>
 	</div>
 </form>
 
-<div>
-	<a asp-action="Login">Đăng nhập</a>
+<div class="form-group" style="display: flex; justify-content: center;">
+	<a asp-action="Login" class="login-link" >Đăng nhập</a>
 </div>
 
 @section Scripts {
@@ -98,23 +106,45 @@
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
 		$(document).ready(function () {
-			$('#username').on('blur', function () {
+			$('#UserName').on('input', function () {
 				const username = $(this).val();
-				$.get('@Url.Action("IsUsernameAvailable", "Customers")', { username: username }, function (data) {
-					if (!data) {
-						$('#usernameAvailability').text('Tên đăng nhập đã được sử dụng.').show();
-					}
+				if (username) { // Only check if there's input
+					$.get('@Url.Action("IsUsernameAvailable", "Customers")', { username: username }, function (data) {
+						if (!data) {
+							$('#usernameAvailability').text('Tên đăng nhập đã được sử dụng.').show();
+						} else {
+							$('#usernameAvailability').text('').hide();
+						}
+					});
+				} else {
+					$('#usernameAvailability').text('').hide();
+				}
+			});
+
+			$('#Email').on('input', function () {
+				const email = $(this).val();
+				if (email) {
+					$.get('@Url.Action("IsEmailAvailable", "Customers")', { email: email }, function (data) {
+						if (!data) {
+							$('#emailAvailability').text('Email đã được sử dụng.').show();
+						} else {
+							$('#emailAvailability').text('').hide();
+						}
+					});
+				} else {
+					$('#emailAvailability').text('').hide();
+				}
+			});
+
+			$(document).ready(function () {
+				$('#SignUpButton').on('click', function () {
+					// Disable the button to prevent multiple clicks
+					$(this).prop('disabled', true).text('Submitting...');
+					// Optionally disable the entire form
+					$(this).closest('form').submit();
 				});
 			});
 
-			$('#email').on('blur', function () {
-				const email = $(this).val();
-				$.get('@Url.Action("IsEmailAvailable", "Customers")', { email: email }, function (data) {
-					if (!data) {
-						$('#emailAvailability').text('Email đã được sử dụng.').show();
-					}
-				});
-			});
 		});
 	</script>
 }

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Website_ASP.NET_Core_MVC.Data;
+using Website_ASP.NET_Core_MVC.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddControllersWithViews()
             .AddRazorRuntimeCompilation(); // Enable runtime compilation
 
+builder.Services.AddAutoMapper(typeof(AutoMapperCustomer));
 
 var app = builder.Build();
 

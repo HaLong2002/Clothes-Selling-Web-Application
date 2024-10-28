@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Website_ASP.NET_Core_MVC.Data;
+using Website_ASP.NET_Core_MVC.Helpers;
 using Website_ASP.NET_Core_MVC.Models;
 using Website_ASP.NET_Core_MVC.ViewModels;
 
@@ -14,10 +16,12 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 	public class CustomersController : Controller
 	{
 		private readonly ApplicationDbContext _context;
+		private readonly IMapper _mapper;
 
-		public CustomersController(ApplicationDbContext context)
+		public CustomersController(ApplicationDbContext context, IMapper mapper)
 		{
 			_context = context;
+			_mapper = mapper;
 		}
 
 		// GET: Customers
@@ -74,17 +78,13 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 			if (ModelState.IsValid)
 			{
 				// Map ViewModel to Model
-				var customer = new Customer
-				{
-					UserName = customerViewModel.UserName,
-					Email = customerViewModel.Email,
-					Password = customerViewModel.Password, // Ensure password handling is secure
-					Phone = customerViewModel.Phone,
-					FullName = customerViewModel.FullName,
-					Gender = customerViewModel.Gender,
-					Date = customerViewModel.Date,
-					Address = customerViewModel.Address
-				};
+				var customer = _mapper.Map<Customer>(customerViewModel);
+
+				// Mã hóa mật khẩu
+				string randomKey = MyUtil.GenerateRandomKey();
+				customer.Password = customerViewModel.Password.ToMd5Hash(randomKey);
+
+				customer.IsValid = true;
 
 				// If both checks pass, save the user
 				_context.Add(customer);
