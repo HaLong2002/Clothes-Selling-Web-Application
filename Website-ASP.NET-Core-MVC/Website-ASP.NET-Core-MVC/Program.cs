@@ -1,22 +1,35 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Configuration;
 using Website_ASP.NET_Core_MVC.Data;
 using Website_ASP.NET_Core_MVC.Helpers;
+using Website_ASP.NET_Core_MVC.Models;
+using Website_ASP.NET_Core_MVC.ViewModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add Email
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+			.AddRazorRuntimeCompilation(); // Enable runtime compilation
 
 // Add the database context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddControllersWithViews()
-            .AddRazorRuntimeCompilation(); // Enable runtime compilation
+// Configure Identity
+builder.Services.AddIdentity<Customer, IdentityRole<int>>()
+		.AddEntityFrameworkStores<ApplicationDbContext>()
+		.AddDefaultTokenProviders();
+builder.Services.Configure<IdentityOptions>(options =>
+{
+	options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+});
 
 builder.Services.AddAutoMapper(typeof(AutoMapperCustomer));
 

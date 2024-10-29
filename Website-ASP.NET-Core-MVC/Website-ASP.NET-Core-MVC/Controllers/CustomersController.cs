@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -19,12 +20,14 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 		private readonly ApplicationDbContext _context;
 		private readonly IMapper _mapper;
 		private readonly IEmailSender _emailSender;
+		private readonly UserManager<Customer> _userManager;
 
-		public CustomersController(ApplicationDbContext context, IMapper mapper, IEmailSender emailSender)
+		public CustomersController(ApplicationDbContext context, IMapper mapper, IEmailSender emailSender, UserManager<Customer> userManager)
 		{
 			_context = context;
 			_mapper = mapper;
 			_emailSender = emailSender;
+			_userManager = userManager;
 		}
 
 		// GET: Customers
@@ -54,7 +57,17 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 		// GET: Customers/SignUp
 		public IActionResult SignUp()
 		{
-			return View();
+			var model = new CustomerViewModel
+			{
+				GenderOptions = new List<SelectListItem>
+				{
+					new SelectListItem { Value = "Nữ", Text = "Nữ" },
+					new SelectListItem { Value = "Nam", Text = "Nam" },
+					new SelectListItem { Value = "Khác", Text = "Khác" }
+				}
+			};
+
+			return View(model);
 		}
 
 		// API endpoint to check for unique username
@@ -79,18 +92,21 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 		{
 			if (ModelState.IsValid)
 			{
+				customerViewModel.UserName = customerViewModel.UserName.Trim();
+
 				// Map ViewModel to Model
 				var customer = _mapper.Map<Customer>(customerViewModel);
 
+				/*
 				// Mã hóa mật khẩu
 				string randomKey = MyUtil.GenerateRandomKey();
 				customer.Password = customerViewModel.Password.ToMd5Hash(randomKey);
 
 				// Gửi email cho người dùng để xác nhận
-				customer.IsValid = false;
-				var random = new Random();
-				string code = random.Next(100000, 1000000).ToString();
-				string subject = code + " là mã xác minh DDDK của bạn";
+				//customer.IsValid = false;
+				//var random = new Random();
+				//string code = random.Next(100000, 1000000).ToString();
+				//string subject = code + " là mã xác minh DDDK của bạn";
 				string messageBody = EmailMessageBody(code);
 				await _emailSender.SendEmailAsync(customer.Email, subject, messageBody);
 
@@ -98,6 +114,34 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 				_context.Add(customer);
 				await _context.SaveChangesAsync();
 				return RedirectToAction(nameof(Index));
+				*/
+				// Use UserManager to create the user with password hashing
+
+				var result = await _userManager.CreateAsync(customer, customerViewModel.Password);
+
+				if (result.Succeeded)
+				{
+					// Generate a confirmation token
+					var token = await _userManager.GenerateEmailConfirmationTokenAsync(customer);
+
+					// Create the confirmation link
+					var confirmationLink = Url.Action("ConfirmEmail", "Customers", new { userId = customer.Id, token }, Request.Scheme);
+
+					// Prepare the email message
+					string subject = "Email Confirmation";
+					string messageBody = $"Please confirm your email by clicking this link: <a href='{confirmationLink}'>Confirm Email</a>";
+
+					// Send confirmation email
+					await _emailSender.SendEmailAsync(customer.Email, subject, messageBody);
+
+					return RedirectToAction(nameof(Index));
+				}
+
+				// Handle creation errors
+				foreach (var error in result.Errors)
+				{
+					ModelState.AddModelError(string.Empty, error.Description);
+				}
 			}
 			return View(customerViewModel);
 		}
@@ -128,6 +172,22 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 				";
 
 			return messageBody;
+		}
+
+		// GET: Customers/SignUp
+		public IActionResult ConfirmEmail()
+		{
+			var model = new CustomerViewModel
+			{
+				GenderOptions = new List<SelectListItem>
+				{
+					new SelectListItem { Value = "Nữ", Text = "Nữ" },
+					new SelectListItem { Value = "Nam", Text = "Nam" },
+					new SelectListItem { Value = "Khác", Text = "Khác" }
+				}
+			};
+
+			return View(model);
 		}
 
 		// GET: Customers/Edit/5

@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Website_ASP.NET_Core_MVC.Models
 {
-    public class Customer
-    {
+    public class Customer : IdentityUser<int>
+	{
         public int Id { get; set; }
 		public string UserName { get; set; }
 		public string Email { get; set; }
@@ -18,6 +19,6 @@ namespace Website_ASP.NET_Core_MVC.Models
 		public DateTime? Date { get; set; }
 		public string Address { get; set; }
 		public string? Image { get; set; }
-		public bool IsValid { get; set; }
+		public bool IsValid { get; set; } = false;
     }
 }
