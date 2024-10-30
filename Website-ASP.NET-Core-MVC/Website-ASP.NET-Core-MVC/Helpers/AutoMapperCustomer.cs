@@ -8,7 +8,7 @@ namespace Website_ASP.NET_Core_MVC.Helpers
 	{
 		public AutoMapperCustomer()
 		{
-			CreateMap<CustomerViewModel, Customer>();
+			CreateMap<RegisterViewModel, User>();
 		}
 	}
 }

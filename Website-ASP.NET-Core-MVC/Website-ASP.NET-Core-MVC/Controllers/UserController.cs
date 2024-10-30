@@ -15,14 +15,14 @@ using Website_ASP.NET_Core_MVC.ViewModels;
 
 namespace Website_ASP.NET_Core_MVC.Controllers
 {
-	public class CustomersController : Controller
+	public class UserController : Controller
 	{
 		private readonly ApplicationDbContext _context;
 		private readonly IMapper _mapper;
 		private readonly IEmailSender _emailSender;
-		private readonly UserManager<Customer> _userManager;
+		private readonly UserManager<User> _userManager;
 
-		public CustomersController(ApplicationDbContext context, IMapper mapper, IEmailSender emailSender, UserManager<Customer> userManager)
+		public UserController(ApplicationDbContext context, IMapper mapper, IEmailSender emailSender, UserManager<User> userManager)
 		{
 			_context = context;
 			_mapper = mapper;
@@ -30,34 +30,10 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 			_userManager = userManager;
 		}
 
-		// GET: Customers
-		public async Task<IActionResult> Index()
-		{
-			return View(await _context.Customers.ToListAsync());
-		}
-
-		// GET: Customers/Details/5
-		public async Task<IActionResult> Details(int? id)
-		{
-			if (id == null)
-			{
-				return NotFound();
-			}
-
-			var customer = await _context.Customers
-				.FirstOrDefaultAsync(m => m.Id == id);
-			if (customer == null)
-			{
-				return NotFound();
-			}
-
-			return View(customer);
-		}
-
 		// GET: Customers/SignUp
 		public IActionResult SignUp()
 		{
-			var model = new CustomerViewModel
+			var model = new RegisterViewModel
 			{
 				GenderOptions = new List<SelectListItem>
 				{
@@ -69,33 +45,33 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 
 			return View(model);
 		}
-
+		
 		// API endpoint to check for unique username
-		[HttpGet]
-		public async Task<JsonResult> IsUsernameAvailable(string username)
-		{
-			bool isAvailable = !await _context.Customers.AnyAsync(u => u.UserName == username);
-			return Json(isAvailable);
-		}
+		//[HttpGet]
+		//public async Task<JsonResult> IsUsernameAvailable(string username)
+		//{
+		//	bool isAvailable = !await _context.Customers.AnyAsync(u => u.UserName == username);
+		//	return Json(isAvailable);
+		//}
 
-		// API endpoint to check for unique email
-		[HttpGet]
-		public async Task<JsonResult> IsEmailAvailable(string email)
-		{
-			bool isAvailable = !await _context.Customers.AnyAsync(u => u.Email == email);
-			return Json(isAvailable);
-		}
+		//// API endpoint to check for unique email
+		//[HttpGet]
+		//public async Task<JsonResult> IsEmailAvailable(string email)
+		//{
+		//	bool isAvailable = !await _context.Customers.AnyAsync(u => u.Email == email);
+		//	return Json(isAvailable);
+		//}
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> SignUp(CustomerViewModel customerViewModel)
+		public async Task<IActionResult> SignUp(RegisterViewModel customerViewModel)
 		{
 			if (ModelState.IsValid)
 			{
-				customerViewModel.UserName = customerViewModel.UserName.Trim();
+				customerViewModel.Name = customerViewModel.Name.Trim();
 
 				// Map ViewModel to Model
-				var customer = _mapper.Map<Customer>(customerViewModel);
+				var customer = _mapper.Map<User>(customerViewModel);
 
 				/*
 				// Mã hóa mật khẩu
@@ -177,104 +153,9 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 		// GET: Customers/SignUp
 		public IActionResult ConfirmEmail()
 		{
-			var model = new CustomerViewModel
-			{
-				GenderOptions = new List<SelectListItem>
-				{
-					new SelectListItem { Value = "Nữ", Text = "Nữ" },
-					new SelectListItem { Value = "Nam", Text = "Nam" },
-					new SelectListItem { Value = "Khác", Text = "Khác" }
-				}
-			};
-
-			return View(model);
+			return View();
 		}
 
-		// GET: Customers/Edit/5
-		public async Task<IActionResult> Edit(int? id)
-		{
-			if (id == null)
-			{
-				return NotFound();
-			}
-
-			var customer = await _context.Customers.FindAsync(id);
-			if (customer == null)
-			{
-				return NotFound();
-			}
-			return View(customer);
-		}
-
-		// POST: Customers/Edit/5
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Edit(int id, [Bind("Id,UserName,Email,Password,Phone,FullName,Gender,Date,Address")] Customer customer)
-		{
-			if (id != customer.Id)
-			{
-				return NotFound();
-			}
-
-			if (ModelState.IsValid)
-			{
-				try
-				{
-					_context.Update(customer);
-					await _context.SaveChangesAsync();
-				}
-				catch (DbUpdateConcurrencyException)
-				{
-					if (!CustomerExists(customer.Id))
-					{
-						return NotFound();
-					}
-					else
-					{
-						throw;
-					}
-				}
-				return RedirectToAction(nameof(Index));
-			}
-			return View(customer);
-		}
-
-		// GET: Customers/Delete/5
-		public async Task<IActionResult> Delete(int? id)
-		{
-			if (id == null)
-			{
-				return NotFound();
-			}
-
-			var customer = await _context.Customers
-				.FirstOrDefaultAsync(m => m.Id == id);
-			if (customer == null)
-			{
-				return NotFound();
-			}
-
-			return View(customer);
-		}
-
-		// POST: Customers/Delete/5
-		[HttpPost, ActionName("Delete")]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> DeleteConfirmed(int id)
-		{
-			var customer = await _context.Customers.FindAsync(id);
-			if (customer != null)
-			{
-				_context.Customers.Remove(customer);
-			}
-
-			await _context.SaveChangesAsync();
-			return RedirectToAction(nameof(Index));
-		}
-
-		private bool CustomerExists(int id)
-		{
-			return _context.Customers.Any(e => e.Id == id);
-		}
+		
 	}
 }

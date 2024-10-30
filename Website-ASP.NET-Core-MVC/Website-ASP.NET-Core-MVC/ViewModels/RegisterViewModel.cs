@@ -4,26 +4,25 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Website_ASP.NET_Core_MVC.ViewModels
 {
-	public class CustomerViewModel
+	public class RegisterViewModel
 	{
-		public int Id { get; set; }
-
 		[Required(ErrorMessage = "Vui lòng nhập tên đăng nhập")]
 		[MaxLength(20, ErrorMessage = "Tối đa 20 kí tự")]
-		public string UserName { get; set; }
+		public string Name { get; set; }
 
 		[Required(ErrorMessage = "Vui lòng nhập email")]
 		[EmailAddress(ErrorMessage = "Email không đúng định dạng")]
 		public string Email { get; set; }
 
 		[Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
+		[StringLength(40, MinimumLength = 8, ErrorMessage = "The {0} must be at {2} and at max {1} characters long")]
 		[DataType(DataType.Password)]
-		[RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d).+$", ErrorMessage = "Mật khẩu phải chứa cả chữ và số")]
+		[Compare("ConfirmPassword", ErrorMessage = "Mật khẩu không khớp")]
 		public string Password { get; set; }
 
 		[Required(ErrorMessage = "Vui lòng nhập lại mật khẩu")]
 		[DataType(DataType.Password)]
-		[Compare("Password", ErrorMessage = "Mật khẩu không khớp")]
+		[Display(Name = "Xác nhận mật khẩu")]
 		public string ConfirmPassword { get; set; }
 
 		[Required(ErrorMessage = "Vui lòng nhập số điện thoại")]
