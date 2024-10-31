@@ -10,9 +10,10 @@ namespace Website_ASP.NET_Core_MVC.ViewModels
 
 		[Required(ErrorMessage = "Vui lòng nhập password")]
 		[DataType(DataType.Password)]
+		[Display(Name = "Mật khẩu")]
 		public string Password { get; set; }
 
-		[Display(Name = "Remember me?")]
+		[Display(Name = "Nhớ tài khoản?")]
 		public bool RememberMe { get; set; }
 	}
 }

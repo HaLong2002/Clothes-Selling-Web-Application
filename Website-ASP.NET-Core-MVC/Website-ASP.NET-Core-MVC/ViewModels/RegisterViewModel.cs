@@ -6,8 +6,9 @@ namespace Website_ASP.NET_Core_MVC.ViewModels
 {
 	public class RegisterViewModel
 	{
-		[Required(ErrorMessage = "Vui lòng nhập tên đăng nhập")]
+		[Required(ErrorMessage = "Vui lòng nhập tên của bạn")]
 		[MaxLength(20, ErrorMessage = "Tối đa 20 kí tự")]
+		[Display(Name = "Tên của bạn")]
 		public string Name { get; set; }
 
 		[Required(ErrorMessage = "Vui lòng nhập email")]
@@ -15,38 +16,15 @@ namespace Website_ASP.NET_Core_MVC.ViewModels
 		public string Email { get; set; }
 
 		[Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
-		[StringLength(40, MinimumLength = 8, ErrorMessage = "The {0} must be at {2} and at max {1} characters long")]
+		[StringLength(40, MinimumLength = 8, ErrorMessage = "{0} phải dài từ {2} đến tối đa {1} ký tự")]
 		[DataType(DataType.Password)]
-		[Compare("ConfirmPassword", ErrorMessage = "Mật khẩu không khớp")]
+		[Display(Name = "Mật khẩu")]
 		public string Password { get; set; }
 
 		[Required(ErrorMessage = "Vui lòng nhập lại mật khẩu")]
 		[DataType(DataType.Password)]
+		[Compare("Password", ErrorMessage = "Mật khẩu không khớp")]
 		[Display(Name = "Xác nhận mật khẩu")]
 		public string ConfirmPassword { get; set; }
-
-		[Required(ErrorMessage = "Vui lòng nhập số điện thoại")]
-		[RegularExpression(@"^(\d{10})$", ErrorMessage = "Số điện thoại không hợp lệ")]
-		public string Phone { get; set; }
-
-		[Required(ErrorMessage = "Vui lòng nhập họ và tên")]
-		[MaxLength(50, ErrorMessage = "Tối đa 50 kí tự")]
-		public string FullName { get; set; }
-
-		public string? Gender { get; set; }
-
-		public IEnumerable<SelectListItem> GenderOptions { get; set; } = new List<SelectListItem>
-	{
-		new SelectListItem { Value = "Nữ", Text = "Nữ" },
-		new SelectListItem { Value = "Nam", Text = "Nam" },
-		new SelectListItem { Value = "Khác", Text = "Khác" }
-	};
-
-		[DataType(DataType.Date)] // Specify date only, no time
-		[DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy}")]
-		public DateTime? Date { get; set; }
-
-		[Required(ErrorMessage = "Vui lòng nhập địa chỉ")]
-		public string Address { get; set; }
 	}
 }

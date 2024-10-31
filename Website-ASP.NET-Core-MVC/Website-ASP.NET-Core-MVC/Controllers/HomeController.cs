@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Website_ASP.NET_Core_MVC.Models;
@@ -18,6 +19,7 @@ namespace Website_ASP.NET_Core_MVC.Controllers
             return View();
         }
 
+        [Authorize]
         public IActionResult Privacy()
         {
             return View();
