@@ -44,7 +44,8 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 				}
 				else if (result.IsNotAllowed)
 				{
-					ModelState.AddModelError("", "Email " + model.Email + " chưa được xác nhận.\n Vui lòng kiểm tra lại mail của chúng tôi đã gửi cho bạn.");
+					var resendLink = Url.Action("ResendConfirmationEmail", "Account");
+					ModelState.AddModelError("", $"Email chưa được xác nhận. Vui lòng kiểm tra email của bạn để xác nhận hoặc <a href='{resendLink}'> nhấn vào đây để gửi lại</a>.");
 					return View(model);
 				}
 				else
@@ -81,13 +82,11 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 					return View("RegistrationSuccessful");
 					//return RedirectToAction("Login", "Account");
 				}
-				else
-				{
-					foreach (var error in result.Errors)
-					{
-						ModelState.AddModelError("", error.Description);
-					}
 
+				var checkEmail = await _userManager.FindByEmailAsync(model.Email);
+				if (checkEmail != null)
+				{
+					ModelState.AddModelError("", "Email đã được dùng");
 					return View(model);
 				}
 			}
@@ -107,36 +106,70 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 			await _emailSender.SendEmailAsync(email, "Xác nhận Email của bạn", $"Vui lòng xác nhận tài khoản tại đây <a href='{HtmlEncoder.Default.Encode(ConfirmationLink)}'>clicking here</a>.");
 		}
 
+		[HttpGet]
+		[AllowAnonymous]
+		public async Task<IActionResult> ConfirmEmail(string UserId, string Token)
+		{
+			if (UserId == null || Token == null)
+			{
+				ViewBag.Message = "Đường link không hợp lệ hoặc đã hết hiệu lực";
+			}
+
+			//Find the User By Id
+			var user = await _userManager.FindByIdAsync(UserId);
+			if (user == null)
+			{
+				ViewBag.ErrorMessage = $"ID người dùng: {UserId} không hợp lệ";
+				return View("NotFound");
+			}
+
+			//Call the ConfirmEmailAsync Method which will mark the Email as Confirmed
+			var result = await _userManager.ConfirmEmailAsync(user, Token);
+			if (result.Succeeded)
+			{
+				ViewBag.Message = "Cảm ơn bạn đã xác nhận email";
+				return View();
+			}
+
+			ViewBag.Message = "Email không thể được xác nhận";
+			return View();
+		}
+
         [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> ConfirmEmail(string UserId, string Token)
-        {
-            if (UserId == null || Token == null)
-            {
-                ViewBag.Message = "Đường link không hợp lệ hoặc đã hết hiệu lực";
-            }
+		[AllowAnonymous]
+		public IActionResult ResendConfirmationEmail(bool IsResend = true)
+		{
+			if (IsResend)
+			{
+				ViewBag.Message = "Gửi lại Email xác nhận";
+			}
+			else
+			{
+				ViewBag.Message = "Đã gửi Email xác nhận";
+			}
+			return View();
+		}
 
-            //Find the User By Name
-            var user = await _userManager.FindByEmailAsync(UserId);
-            if (user == null)
-            {
-                ViewBag.ErrorMessage = $"ID người dùng: {UserId} không hợp lệ";
-                return View("NotFound");
-            }
+		[HttpPost]
+		[AllowAnonymous]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> ResendConfirmationEmail(string Email)
+		{
+			var user = await _userManager.FindByEmailAsync(Email);
+			if (user == null || await _userManager.IsEmailConfirmedAsync(user))
+			{
+				// Handle the situation when the user does not exist or Email already confirmed.
+				// For security, don't reveal that the user does not exist or Email is already confirmed
+				return View("ConfirmationEmailSent");
+			}
 
-            //Call the ConfirmEmailAsync Method which will mark the Email as Confirmed
-            var result = await _userManager.ConfirmEmailAsync(user, Token);
-            if (result.Succeeded)
-            {
-                ViewBag.Message = "Cảm ơn bạn đã xác nhận email của bạn";
-                return View();
-            }
+			//Then send the Confirmation Email to the User
+			await SendConfirmationEmail(Email, user);
 
-            ViewBag.Message = "Email không thể được xác nhận";
-            return View();
-        }
+			return View("ConfirmationEmailSent");
+		}
 
-        public IActionResult VerifyEmail()
+		public IActionResult VerifyEmail()
 		{
 			return View();
 		}
