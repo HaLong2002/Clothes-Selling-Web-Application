@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Configuration;
 using Website_ASP.NET_Core_MVC.Data;
-using Website_ASP.NET_Core_MVC.Helpers;
 using Website_ASP.NET_Core_MVC.Models;
+using Website_ASP.NET_Core_MVC.Services;
 using Website_ASP.NET_Core_MVC.ViewModels;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,14 +31,14 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 	options.Password.RequireLowercase = false;
 	options.User.RequireUniqueEmail = true;
 	options.SignIn.RequireConfirmedAccount = false;
-	options.SignIn.RequireConfirmedEmail = false;
+	options.SignIn.RequireConfirmedEmail = true;
 	options.SignIn.RequireConfirmedPhoneNumber = false;
 })
 		.AddEntityFrameworkStores<ApplicationDbContext>()
 		.AddDefaultTokenProviders();
 
 // Add Auto Mapper
-builder.Services.AddAutoMapper(typeof(AutoMapperCustomer));
+//builder.Services.AddAutoMapper(typeof(AutoMapperCustomer));
 
 
 var app = builder.Build();

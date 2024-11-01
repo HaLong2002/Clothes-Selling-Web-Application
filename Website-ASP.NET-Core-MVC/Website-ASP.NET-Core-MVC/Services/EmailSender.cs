@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Options;
 
-namespace Website_ASP.NET_Core_MVC.Helpers
+namespace Website_ASP.NET_Core_MVC.Services
 {
     public class EmailSender : IEmailSender
     {
