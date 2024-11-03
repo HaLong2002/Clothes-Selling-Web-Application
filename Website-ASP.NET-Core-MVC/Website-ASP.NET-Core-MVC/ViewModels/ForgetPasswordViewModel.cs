@@ -2,7 +2,7 @@
 
 namespace Website_ASP.NET_Core_MVC.ViewModels
 {
-	public class VerifyEmailViewModel
+	public class ForgetPasswordViewModel
 	{
 		[Required(ErrorMessage = "Vui lòng nhập email")]
 		[EmailAddress]

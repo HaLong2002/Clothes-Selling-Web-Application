@@ -2,8 +2,10 @@
 
 namespace Website_ASP.NET_Core_MVC.ViewModels
 {
-	public class ChangePasswordViewModel
+	public class ResetPasswordViewModel
 	{
+		public string Code { get; set; }
+
 		[Required(ErrorMessage = "Vui lòng nhập email")]
 		[EmailAddress]
 		public string Email { get; set; }
