@@ -193,8 +193,8 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 				{
 					// Send an email with this link
 					string code = await _userManager.GeneratePasswordResetTokenAsync(user);
-					var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
-					await _emailSender.SendEmailAsync(user.Id, "Đặt lại mật khẩu của bạn", "Vui lòng đặt lại mật khẩu của bạn bằng cách nhấn vào link sau <a href=\"" + callbackUrl + "\">here</a>");
+					var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code, email = model.Email }, protocol: HttpContext.Request.Scheme);
+					await _emailSender.SendEmailAsync(model.Email, "Đặt lại mật khẩu của bạn", "Vui lòng đặt lại mật khẩu của bạn bằng cách nhấn vào link sau <a href=\"" + callbackUrl + "\">here</a>");
 
 					return RedirectToAction("ForgetPasswordConfirmation", "Account");
 
@@ -209,21 +209,21 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 		}
 
 		[AllowAnonymous]
-		public ActionResult ForgetPasswordConfirmation()
+		public IActionResult ForgetPasswordConfirmation()
 		{
 			return View();
 		}
 
         [AllowAnonymous]
-        public IActionResult ResetPassword(string code)
+        public IActionResult ResetPassword(string code, string email)
         {
-            return code == null ? View("Error") : View();
+            return code == null ? View("NotFound") : View(new ResetPasswordViewModel { Code = code, Email = email });
         }
 
 		[HttpPost]
 		[AllowAnonymous]
 		[ValidateAntiForgeryToken]
-		public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
+		public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -240,116 +240,116 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 			//var result =  UserManager.ResetPassword(user.Id, model.Code, model.Password);
 			if (result.Succeeded)
 			{
-				return RedirectToAction("ResetPasswordConfirmation", "Account");
+				return RedirectToAction("Login", "Account");
 			}
 			//AddErrors(result);
-			return View("Error");
+			return View("NotFound");
 			//return View();
 		}
 
 		//============================================================================
 
-		private async Task SendPasswordResetEmail(string? email, User? user)
-		{
-			//Generate the Token
-			var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-			var encodedToken = Encoding.UTF8.GetBytes(token);
-			var validToken = WebEncoders.Base64UrlEncode(encodedToken);
+		//private async Task SendPasswordResetEmail(string? email, User? user)
+		//{
+		//	//Generate the Token
+		//	var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+		//	var encodedToken = Encoding.UTF8.GetBytes(token);
+		//	var validToken = WebEncoders.Base64UrlEncode(encodedToken);
 
-			//Build the reset Link which must include the Callback URL
-			var ResetLink = Url.Action("ResetPassword", "Account",
-			new { Email = email, Token = validToken }, protocol: HttpContext.Request.Scheme);
+		//	//Build the reset Link which must include the Callback URL
+		//	var ResetLink = Url.Action("ResetPassword", "Account",
+		//	new { Email = email, Token = validToken }, protocol: HttpContext.Request.Scheme);
 
-			//Send the Confirmation Email to the User Email Id
-			await _emailSender.SendEmailAsync(email, "Đặt lại mật khẩu", $"Vui lòng đặt lại mật khẩu của bạn tại đây <a href='{HtmlEncoder.Default.Encode(ResetLink)}'>clicking here</a>.");
-		}
+		//	//Send the Confirmation Email to the User Email Id
+		//	await _emailSender.SendEmailAsync(email, "Đặt lại mật khẩu", $"Vui lòng đặt lại mật khẩu của bạn tại đây <a href='{HtmlEncoder.Default.Encode(ResetLink)}'>clicking here</a>.");
+		//}
 
-		[HttpGet]
-		[AllowAnonymous]
-		public async Task<IActionResult> ResetPassword(string Email, string Token, ResetPasswordViewModel model)
-		{
-			if (Email == null || Token == null)
-			{
-				ViewBag.Message = "Đường link không hợp lệ hoặc đã hết hiệu lực";
-			}
+		//[HttpGet]
+		//[AllowAnonymous]
+		//public async Task<IActionResult> ResetPassword(string Email, string Token, ResetPasswordViewModel model)
+		//{
+		//	if (Email == null || Token == null)
+		//	{
+		//		ViewBag.Message = "Đường link không hợp lệ hoặc đã hết hiệu lực";
+		//	}
 
-			//Find the User By Email
-			var user = await _userManager.FindByEmailAsync(Email);
-			if (user == null)
-			{
-				ViewBag.ErrorMessage = $"Email: {Email} không hợp lệ";
-				return View("NotFound");
-			}
+		//	//Find the User By Email
+		//	var user = await _userManager.FindByEmailAsync(Email);
+		//	if (user == null)
+		//	{
+		//		ViewBag.ErrorMessage = $"Email: {Email} không hợp lệ";
+		//		return View("NotFound");
+		//	}
 
-			if (ModelState.IsValid)
-			{
-				//Call the ResetPasswordAsync Method
-				var result = await _userManager.ResetPasswordAsync(user, Token, model.NewPassword);
-				if (result.Succeeded)
-				{
-					ViewBag.Message = "Đặt lại mật khẩu thành công!";
-					return RedirectToAction("Login", "Account");
-					//return View();
-				}
-			}
-			else
-			{
-				ModelState.AddModelError("", "Có gì đó không đúng. Hãy thử lại.");
-				return View(model);
-			}
+		//	if (ModelState.IsValid)
+		//	{
+		//		//Call the ResetPasswordAsync Method
+		//		var result = await _userManager.ResetPasswordAsync(user, Token, model.NewPassword);
+		//		if (result.Succeeded)
+		//		{
+		//			ViewBag.Message = "Đặt lại mật khẩu thành công!";
+		//			return RedirectToAction("Login", "Account");
+		//			//return View();
+		//		}
+		//	}
+		//	else
+		//	{
+		//		ModelState.AddModelError("", "Có gì đó không đúng. Hãy thử lại.");
+		//		return View(model);
+		//	}
 
-			ViewBag.Message = "Không thể đặt lại mật khẩu";
-			return View();
-		}
+		//	ViewBag.Message = "Không thể đặt lại mật khẩu";
+		//	return View();
+		//}
 
 
-		public IActionResult ChangePassword(string username)
-		{
-			if (string.IsNullOrEmpty(username))
-			{
-				return RedirectToAction("VerifyEmail", "Account");
-			}
-			return View(new ResetPasswordViewModel { Email = username });
-		}
+		//public IActionResult ChangePassword(string username)
+		//{
+		//	if (string.IsNullOrEmpty(username))
+		//	{
+		//		return RedirectToAction("VerifyEmail", "Account");
+		//	}
+		//	return View(new ResetPasswordViewModel { Email = username });
+		//}
 
-		[HttpPost]
-		public async Task<IActionResult> ChangePassword(ResetPasswordViewModel model)
-		{
-			if (ModelState.IsValid)
-			{
-				var user = await _userManager.FindByNameAsync(model.Email);
+		//[HttpPost]
+		//public async Task<IActionResult> ChangePassword(ResetPasswordViewModel model)
+		//{
+		//	if (ModelState.IsValid)
+		//	{
+		//		var user = await _userManager.FindByNameAsync(model.Email);
 
-				if (user != null)
-				{
-					var result = await _userManager.RemovePasswordAsync(user);
+		//		if (user != null)
+		//		{
+		//			var result = await _userManager.RemovePasswordAsync(user);
 
-					if (result.Succeeded)
-					{
-						result = await _userManager.AddPasswordAsync(user, model.NewPassword);
-						return RedirectToAction("Login", "Account");
-					}
-					else
-					{
-						foreach (var error in result.Errors)
-						{
-							ModelState.AddModelError("", error.Description);
-						}
+		//			if (result.Succeeded)
+		//			{
+		//				result = await _userManager.AddPasswordAsync(user, model.NewPassword);
+		//				return RedirectToAction("Login", "Account");
+		//			}
+		//			else
+		//			{
+		//				foreach (var error in result.Errors)
+		//				{
+		//					ModelState.AddModelError("", error.Description);
+		//				}
 
-						return View(model);
-					}
-				}
-				else
-				{
-					ModelState.AddModelError("", "Email không được tìm thấy!");
-					return View(model);
-				}
-			}
-			else
-			{
-				ModelState.AddModelError("", "Có gì đó không đúng. Hãy thử lại.");
-				return View(model);
-			}
-		}
+		//				return View(model);
+		//			}
+		//		}
+		//		else
+		//		{
+		//			ModelState.AddModelError("", "Email không được tìm thấy!");
+		//			return View(model);
+		//		}
+		//	}
+		//	else
+		//	{
+		//		ModelState.AddModelError("", "Có gì đó không đúng. Hãy thử lại.");
+		//		return View(model);
+		//	}
+		//}
 
 		public async Task<IActionResult> Logout()
 		{
