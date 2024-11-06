@@ -1,13 +1,13 @@
-﻿.account-container{
+﻿.account-container {
     /*background-image:url('../Images/heart_background.jpg');
     background-size:cover;
     background-position:center;
     background-repeat:repeat-y;*/
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-    padding:2rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem 0;
 }
 
 .account-box {
@@ -28,4 +28,22 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+}
+
+.account-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: 52px;
+    width: 100%;
+    background-color: #10a37f;
+    color: #fff;
+    margin: 24px 0 0;
+    border-radius: 6px;
+    padding: 4px 16px;
+    font: inherit;
+    font-size: large;
+    border-width: 0;
+    cursor: pointer;
 }

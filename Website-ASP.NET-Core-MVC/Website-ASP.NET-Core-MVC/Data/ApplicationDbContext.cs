@@ -7,7 +7,7 @@ namespace Website_ASP.NET_Core_MVC.Data
 {
     public class ApplicationDbContext : IdentityDbContext<User>
 	{
-        public ApplicationDbContext(DbContextOptions options) : base(options) {}
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {}
 
         //public DbSet<Customer> Customers { get; set; } // Add your DbSets here
 

@@ -22,24 +22,40 @@ builder.Services.AddControllersWithViews()
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Configure Identity
-builder.Services.AddIdentity<User, IdentityRole>(options =>
+builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
+	.AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.Configure<IdentityOptions>(options =>
 {
-	options.Password.RequireNonAlphanumeric = false;
-	options.Password.RequiredLength = 8;
-	options.Password.RequireUppercase = false;
+	// Password settings.
+	options.Password.RequireDigit = false;
 	options.Password.RequireLowercase = false;
+	options.Password.RequireNonAlphanumeric = false;
+	options.Password.RequireUppercase = false;
+	options.Password.RequiredLength = 6;
+	options.Password.RequiredUniqueChars = 0;
+
+	// Lockout settings.
+	options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+	options.Lockout.MaxFailedAccessAttempts = 5;
+	options.Lockout.AllowedForNewUsers = true;
+
+	// User settings.
+	options.User.AllowedUserNameCharacters =
+	"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
 	options.User.RequireUniqueEmail = true;
-	options.SignIn.RequireConfirmedAccount = false;
-	options.SignIn.RequireConfirmedEmail = true;
-	options.SignIn.RequireConfirmedPhoneNumber = false;
-})
-		.AddEntityFrameworkStores<ApplicationDbContext>()
-		.AddDefaultTokenProviders();
+});
 
-// Add Auto Mapper
-//builder.Services.AddAutoMapper(typeof(AutoMapperCustomer));
+builder.Services.ConfigureApplicationCookie(options =>
+{
+	// Cookie settings
+	options.Cookie.HttpOnly = true;
+	options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
 
+	options.LoginPath = "/Identity/Account/Login";
+	options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+	options.SlidingExpiration = true;
+});
 
 var app = builder.Build();
 
@@ -57,6 +73,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.MapRazorPages();
 
 app.MapControllerRoute(
 	name: "default",

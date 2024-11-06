@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Text;
 using System.Text.Encodings.Web;
 using Website_ASP.NET_Core_MVC.Models;
@@ -79,52 +80,69 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 				if (result.Succeeded)
 				{
 					await SendConfirmationEmail(model.Email, user);
-					return View("RegistrationSuccessful");
+
+					// Checks whether the application requires users to confirm their email address before they can sign in
+					//if (_userManager.Options.SignIn.RequireConfirmedAccount)
+					//{
+					//	return RedirectToPage("RegisterConfirmation", new { email = model.Email });
+					//}
+					//else
+					//{
+					//	await _signInManager.SignInAsync(user, isPersistent: false);
+					//	return LocalRedirect(returnUrl);
+					//}
+
+					return RedirectToPage("RegisterConfirmation", new { email = model.Email });   
 					//return RedirectToAction("Login", "Account");
 				}
 
-				var checkEmail = await _userManager.FindByEmailAsync(model.Email);
-				if (checkEmail != null)
+				//var checkEmail = await _userManager.FindByEmailAsync(model.Email);
+				//if (checkEmail != null)
+				//{
+				//	ModelState.AddModelError("", "Email đã được dùng");
+				//	return View(model);
+				//}
+				foreach (var error in result.Errors)
 				{
-					ModelState.AddModelError("", "Email đã được dùng");
-					return View(model);
+					ModelState.AddModelError(string.Empty, error.Description);
 				}
 			}
 			return View(model);
 		}
 
-		private async Task SendConfirmationEmail(string? email, User? user)
+		private async Task SendConfirmationEmail(string email, User user)
 		{
 			//Generate the Token
-			var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+			var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+			code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
 			//Build the Email Confirmation Link which must include the Callback URL
 			var ConfirmationLink = Url.Action("ConfirmEmail", "Account",
-			new { UserId = user.Id, Token = token }, protocol: HttpContext.Request.Scheme);
+			new { userId = user.Id, code = code }, protocol: Request.Scheme);
 
-			//Send the Confirmation Email to the User Email Id
+			//Send the Confirmation Email to the User Email
 			await _emailSender.SendEmailAsync(email, "Xác nhận Email của bạn", $"Vui lòng xác nhận tài khoản tại đây <a href='{HtmlEncoder.Default.Encode(ConfirmationLink)}'>clicking here</a>.");
 		}
 
 		[HttpGet]
 		[AllowAnonymous]
-		public async Task<IActionResult> ConfirmEmail(string UserId, string Token)
+		public async Task<IActionResult> ConfirmEmail(string userId, string code)
 		{
-			if (UserId == null || Token == null)
+			if (userId == null || code == null)
 			{
 				ViewBag.Message = "Đường link không hợp lệ hoặc đã hết hiệu lực";
 			}
 
 			//Find the User By Id
-			var user = await _userManager.FindByIdAsync(UserId);
+			var user = await _userManager.FindByIdAsync(userId);
 			if (user == null)
 			{
-				ViewBag.ErrorMessage = $"ID người dùng: {UserId} không hợp lệ";
+				ViewBag.ErrorMessage = $"ID người dùng: {userId} không hợp lệ";
 				return View("NotFound");
 			}
 
 			//Call the ConfirmEmailAsync Method which will mark the Email as Confirmed
-			var result = await _userManager.ConfirmEmailAsync(user, Token);
+			var result = await _userManager.ConfirmEmailAsync(user, code);
 			if (result.Succeeded)
 			{
 				ViewBag.Message = "Cảm ơn bạn đã xác nhận email";
