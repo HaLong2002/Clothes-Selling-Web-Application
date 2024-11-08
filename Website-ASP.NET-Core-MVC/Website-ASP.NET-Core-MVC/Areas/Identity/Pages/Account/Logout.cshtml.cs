@@ -36,7 +36,7 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
             {
                 // This needs to be a redirect so that the browser performs a new
                 // request and the identity for the user gets updated.
-                return RedirectToPage();
+                return RedirectToAction("Index", "Home");
             }
         }
     }

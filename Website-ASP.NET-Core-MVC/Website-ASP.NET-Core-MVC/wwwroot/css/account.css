@@ -47,3 +47,21 @@
     border-width: 0;
     cursor: pointer;
 }
+
+/* Change the background and font color of the active navigation link */
+.nav-item .nav-link.active {
+    background-color: #10a37f;
+    color: white;
+}
+
+/* Change the background and font color of the inactive navigation links */
+.nav-item .nav-link:not(.active) {
+    background-color: white;
+    color: #10a37f;
+}
+
+/* Change the background and font color of the navigation links on hover */
+/*.nav-item .nav-link:hover {
+    background-color: white;
+    color: #10a37f;
+}*/
