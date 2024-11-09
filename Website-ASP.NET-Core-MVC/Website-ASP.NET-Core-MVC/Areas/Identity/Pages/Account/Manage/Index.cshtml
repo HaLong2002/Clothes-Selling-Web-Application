@@ -7,21 +7,21 @@
 
 <h3>@ViewData["Title"]</h3>
 <partial name="_StatusMessage" for="StatusMessage" />
-<div class="row">
-    <div class="col-md-6">
-        <form id="profile-form" method="post">
+<form id="profile-form" method="post" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-md-6">
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <div class="form-floating mb-3">
                 <input asp-for="Email" class="form-control" placeholder="Vui lòng chọn Email của bạn." disabled />
                 <label asp-for="Email" class="form-label"></label>
             </div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.FullName" class="form-control" placeholder="Vui lòng nhập nhập tên của bạn."/>
+                <input asp-for="Input.FullName" class="form-control" placeholder="Vui lòng nhập nhập tên của bạn." />
                 <label asp-for="Input.FullName" class="form-label"></label>
                 <span asp-validation-for="Input.FullName" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Vui lòng nhập số điện thoại của bạn."/>
+                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Vui lòng nhập số điện thoại của bạn." />
                 <label asp-for="Input.PhoneNumber" class="form-label"></label>
                 <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
             </div>
@@ -36,15 +36,66 @@
                 <span asp-validation-for="Input.Gender" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.Date" type="date" class="form-control" placeholder="Vui lòng chọn ngày sinh của bạn." asp-format="{0:dd/MM/yyyy}" />
+                <input asp-for="Input.Date" type="date" class="form-control" value="@(Model.Input.Date?.ToString("yyyy-MM-dd"))" placeholder="Vui lòng chọn ngày sinh của bạn." />
                 <label asp-for="Input.Date" class="form-label"></label>
                 <span asp-validation-for="Input.Date" class="text-danger"></span>
             </div>
-            <button id="update-profile-button" type="submit" class="account-button">Lưu</button>
-        </form>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Address" class="form-control" placeholder="Vui lòng nhập địa chỉ của bạn." />
+                <label asp-for="Input.Address" class="form-label"></label>
+                <span asp-validation-for="Input.Address" class="text-danger"></span>
+            </div>
+            <div class="text-center mt-3">
+                <button id="update-profile-button" type="submit" class="account-button">Lưu</button>
+            </div>
+        </div>
+
+        <div class="col-md-6 d-flex align-items-center justify-content-center">
+            <div class="avatar-upload">
+                <div class="avatar-preview mb-3">
+                    <img id="imagePreview"
+                         src="@(string.IsNullOrEmpty(Model.Input.ExistingImage) ? "/Images/CustomerAvatars/default-avatar.png" : Model.Input.ExistingImage)"
+                         alt="Avatar Preview" />
+                </div>
+                <div class="avatar-edit">
+                    <input type="file" id="imageUpload" name="Input.ImageFile" accept=".jpg,.jpeg,.png"
+                           onchange="previewImage(event)" hidden />
+                    <label for="imageUpload" class="avatar-edit-label">
+                        <i class="fas fa-camera"></i> Chọn ảnh
+                    </label>
+                </div>
+                <span asp-validation-for="Input.ImageFile" class="text-danger d-block mt-2"></span>
+            </div>
+        </div>
     </div>
-</div>
+</form>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function previewImage(event) {
+            const reader = new FileReader();
+            const imagePreview = document.getElementById('imagePreview');
+            
+            reader.onload = function() {
+                imagePreview.src = reader.result;
+            }
+            
+            if (event.target.files && event.target.files[0]) {
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        }
+
+        // Optional: Add animation when hovering over the image
+        const avatarPreview = document.querySelector('.avatar-preview');
+        avatarPreview.addEventListener('mouseover', function() {
+            this.style.transform = 'scale(1.02)';
+            this.style.transition = 'transform 0.3s ease';
+        });
+        
+        avatarPreview.addEventListener('mouseout', function() {
+            this.style.transform = 'scale(1)';
+        });
+    </script>
 }
