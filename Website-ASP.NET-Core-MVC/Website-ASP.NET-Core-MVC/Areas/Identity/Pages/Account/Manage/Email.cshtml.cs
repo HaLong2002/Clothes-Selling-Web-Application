@@ -106,6 +106,8 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account.Manage
                     $"Vui lòng Xác nhận tài khoản của bạn tại đây <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                 StatusMessage = "Đã gửi đường link xác nhận để thay đổi email. Vui lòng kiểm tra email của bạn.";
+                //await LoadAsync(user);
+                //return Page();
                 return RedirectToPage();
             }
 

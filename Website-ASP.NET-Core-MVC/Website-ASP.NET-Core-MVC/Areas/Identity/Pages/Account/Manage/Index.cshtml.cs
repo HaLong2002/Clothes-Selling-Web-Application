@@ -56,7 +56,7 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Địa chỉ")]
             public string? Address { get; set; }
 
-            [Phone]
+            [RegularExpression(@"^(\d{10})$", ErrorMessage = "Số điện thoại không hợp lệ")]
             [Display(Name = "Số điện thoại")]
             public string? PhoneNumber { get; set; }
 

@@ -94,7 +94,7 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
 
 				// This doesn't count login failures towards account lockout
 				// To enable password failures to trigger account lockout, set lockoutOnFailure: true
-				var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+				var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
@@ -104,11 +104,13 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
                 //{
                 //    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
                 //}
-                //if (result.IsLockedOut)
-                //{
-                //    _logger.LogWarning("User account locked out.");
-                //    return RedirectToPage("./Lockout");
-                //}
+                if (result.IsLockedOut)
+                {
+                    _logger.LogWarning("Tài khoản của bạn đã bị khóa.");
+                    ModelState.AddModelError(string.Empty, "Tài khoản của bạn đã bị khóa. Vui lòng thử lại sau 5 phút.");
+                    //return RedirectToPage("./Lockout");
+                    return Page();
+                }
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Không thể đăng nhập. Vui lòng kiểm tra thông tin đăng nhập của bạn và đảm bảo tài khoản của bạn đã được xác nhận.");
