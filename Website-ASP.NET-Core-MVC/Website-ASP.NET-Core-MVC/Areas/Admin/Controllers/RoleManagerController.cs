@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 {
-    public class RoleManagerController : Controller
+    //[Area("Admin")]
+	[Authorize(Roles = "Admin")]
+	public class RoleManagerController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;
 

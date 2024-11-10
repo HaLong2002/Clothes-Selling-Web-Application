@@ -109,6 +109,11 @@ app.MapControllerRoute(
       pattern: "{area:exists}/{controller=UserManager}/{action=Index}/{id?}"
     );
 
+app.MapAreaControllerRoute(
+    name: "MyAreaAdmin",
+    areaName: "Admin",
+    pattern: "Admin/{controller=RoleManager}/{action=Index}/{id?}");
+
 app.MapControllerRoute(
     name: "default",
     //pattern: "{controller=Customers}/{action=SignUp}/{id?}");

@@ -48,6 +48,11 @@
     cursor: pointer;
 }
 
+.custom-btn-color {
+    background-color: #10a37f;
+    border-color: #10a37f;
+}
+
 /* Change the background and font color of the active navigation link */
 .nav-item .nav-link.active {
     background-color: #10a37f;

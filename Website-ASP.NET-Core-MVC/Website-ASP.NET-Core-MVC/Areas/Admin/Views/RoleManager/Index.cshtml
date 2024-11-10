@@ -1,31 +1,36 @@
 ﻿@model List<Microsoft.AspNetCore.Identity.IdentityRole>
 @{
-    ViewData["Title"] = "Quản lý vai trò người dùng";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewData["Title"] = "Quản lý vai trò";
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<h1>Quản lý vai trò người dùng</h1>
-<form method="post" asp-action="AddRole" asp-controller="RoleManager">
-    <div class="input-group">
-        <input name="roleName" class="form-control w-25">
-        <span class="input-group-btn">
-            <button class="btn btn-info">Thêm vai trò mới</button>
-        </span>
-    </div>
-</form>
+<h3>Quản lý vai trò</h3>
+<hr/>
+
+<div class="col-md-6">
+	<form method="post" asp-action="AddRole" asp-controller="RoleManager">
+		<div class="input-group">
+			<input name="roleName" class="form-control" placeholder="Nhập tên vai trò">
+			<span class="input-group-btn">
+				<button class="btn btn-info">Thêm vai trò mới</button>
+			</span>
+		</div>
+	</form>
+</div>
+
 <table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Vai trò</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var role in Model)
-        {
-            <tr>
-                <td>@role.Id</td>
-                <td>@role.Name</td>
-            </tr>
-        }
-    </tbody>
+	<thead>
+		<tr>
+			<th>Id</th>
+			<th>Vai trò</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var role in Model)
+		{
+			<tr>
+				<td>@role.Id</td>
+				<td>@role.Name</td>
+			</tr>
+		}
+	</tbody>
 </table>

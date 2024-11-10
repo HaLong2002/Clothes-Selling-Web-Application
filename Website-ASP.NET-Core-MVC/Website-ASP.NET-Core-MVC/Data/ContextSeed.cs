@@ -17,8 +17,8 @@ namespace Website_ASP.NET_Core_MVC.Data
             //Seed Default User
             var defaultUser = new User
             {
-                UserName = "halong122002@gmail.com",
-                Email = "halong122002@gmail.com",
+                UserName = "admin",
+                Email = "admin@gmail.com",
                 FullName = "Hạ Long",
                 EmailConfirmed = true,
                 //PhoneNumberConfirmed = true
