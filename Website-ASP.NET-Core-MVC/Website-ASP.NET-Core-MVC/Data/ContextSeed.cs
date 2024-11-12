@@ -17,9 +17,9 @@ namespace Website_ASP.NET_Core_MVC.Data
             //Seed Default User
             var defaultUser = new User
             {
-                UserName = "admin",
+                UserName = "admin@gmail.com",
                 Email = "admin@gmail.com",
-                FullName = "Hạ Long",
+                FullName = "Admin",
                 EmailConfirmed = true,
                 //PhoneNumberConfirmed = true
             };
@@ -28,11 +28,10 @@ namespace Website_ASP.NET_Core_MVC.Data
                 var user = await userManager.FindByEmailAsync(defaultUser.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(defaultUser, "123Pa$$word.");
-                    await userManager.AddToRoleAsync(defaultUser, Enums.Roles.Customer.ToString());
+                    await userManager.CreateAsync(defaultUser, "123Pa$$word");
+                    //await userManager.AddToRoleAsync(defaultUser, Enums.Roles.Customer.ToString());
                     await userManager.AddToRoleAsync(defaultUser, Enums.Roles.Admin.ToString());
                 }
-
             }
         }
     }

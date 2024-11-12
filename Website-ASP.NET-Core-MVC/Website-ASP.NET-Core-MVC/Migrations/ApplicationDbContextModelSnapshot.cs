@@ -155,6 +155,239 @@ namespace Website_ASP.NET_Core_MVC.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Website_ASP.NET_Core_MVC.Models.ChiTietHoaDon", b =>
+                {
+                    b.Property<int>("MaHD")
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    b.Property<int>("IDCTSP")
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
+
+                    b.Property<decimal>("GiaMua")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("money");
+
+                    b.Property<int>("SoLuongMua")
+                        .HasColumnType("int");
+
+                    b.HasKey("MaHD", "IDCTSP");
+
+                    b.HasIndex("IDCTSP");
+
+                    b.ToTable("ChiTietHoaDon");
+                });
+
+            modelBuilder.Entity("Website_ASP.NET_Core_MVC.Models.DanhMuc", b =>
+                {
+                    b.Property<int>("MaDM")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaDM"));
+
+                    b.Property<DateTime>("NgaySua")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("NgayTao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NguoiSua")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NguoiTao")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TenDanhMuc")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("MaDM");
+
+                    b.ToTable("DanhMuc");
+                });
+
+            modelBuilder.Entity("Website_ASP.NET_Core_MVC.Models.HoaDon", b =>
+                {
+                    b.Property<int>("MaHD")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaHD"));
+
+                    b.Property<string>("DiaChiNhan")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("GhiChu")
+                        .IsRequired()
+                        .HasColumnType("ntext");
+
+                    b.Property<string>("HoTenNguoiNhan")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("MaTK")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("NgayDat")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("NgaySua")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NguoiSua")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("SoDienThoaiNhan")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .IsUnicode(false)
+                        .HasColumnType("char(11)")
+                        .IsFixedLength();
+
+                    b.Property<int>("TrangThai")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("MaHD");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("HoaDon");
+                });
+
+            modelBuilder.Entity("Website_ASP.NET_Core_MVC.Models.KichCo", b =>
+                {
+                    b.Property<int>("MaKichCo")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaKichCo"));
+
+                    b.Property<string>("TenKichCo")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.HasKey("MaKichCo");
+
+                    b.ToTable("KichCo");
+                });
+
+            modelBuilder.Entity("Website_ASP.NET_Core_MVC.Models.SanPham", b =>
+                {
+                    b.Property<int>("MaSP")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaSP"));
+
+                    b.Property<string>("ChatLieu")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("Gia")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("money");
+
+                    b.Property<string>("HinhAnh")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("HuongDan")
+                        .IsRequired()
+                        .HasColumnType("ntext");
+
+                    b.Property<int>("MaDM")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MaMau")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .IsUnicode(false)
+                        .HasColumnType("char(10)")
+                        .IsFixedLength();
+
+                    b.Property<string>("MoTa")
+                        .IsRequired()
+                        .HasColumnType("ntext");
+
+                    b.Property<DateTime>("NgaySua")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("NgayTao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NguoiSua")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NguoiTao")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TenSP")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("MaSP");
+
+                    b.HasIndex("MaDM");
+
+                    b.ToTable("SanPham");
+                });
+
+            modelBuilder.Entity("Website_ASP.NET_Core_MVC.Models.SanPhamChiTiet", b =>
+                {
+                    b.Property<int>("IDCTSP")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IDCTSP"));
+
+                    b.Property<int>("KichCoMaKichCo")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaKichCo")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaSP")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SanPhamMaSP")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SoLuong")
+                        .HasColumnType("int");
+
+                    b.HasKey("IDCTSP");
+
+                    b.HasIndex("KichCoMaKichCo");
+
+                    b.HasIndex("SanPhamMaSP");
+
+                    b.ToTable("SanPhamChiTiet");
+                });
+
             modelBuilder.Entity("Website_ASP.NET_Core_MVC.Models.User", b =>
                 {
                     b.Property<string>("Id")
@@ -285,6 +518,89 @@ namespace Website_ASP.NET_Core_MVC.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Website_ASP.NET_Core_MVC.Models.ChiTietHoaDon", b =>
+                {
+                    b.HasOne("Website_ASP.NET_Core_MVC.Models.SanPhamChiTiet", "SanPhamChiTiet")
+                        .WithMany("ChiTietHoaDons")
+                        .HasForeignKey("IDCTSP")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Website_ASP.NET_Core_MVC.Models.HoaDon", "HoaDon")
+                        .WithMany("ChiTietHoaDons")
+                        .HasForeignKey("MaHD")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("HoaDon");
+
+                    b.Navigation("SanPhamChiTiet");
+                });
+
+            modelBuilder.Entity("Website_ASP.NET_Core_MVC.Models.HoaDon", b =>
+                {
+                    b.HasOne("Website_ASP.NET_Core_MVC.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Website_ASP.NET_Core_MVC.Models.SanPham", b =>
+                {
+                    b.HasOne("Website_ASP.NET_Core_MVC.Models.DanhMuc", "DanhMuc")
+                        .WithMany("SanPhams")
+                        .HasForeignKey("MaDM")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DanhMuc");
+                });
+
+            modelBuilder.Entity("Website_ASP.NET_Core_MVC.Models.SanPhamChiTiet", b =>
+                {
+                    b.HasOne("Website_ASP.NET_Core_MVC.Models.KichCo", "KichCo")
+                        .WithMany("SanPhamChiTiets")
+                        .HasForeignKey("KichCoMaKichCo")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Website_ASP.NET_Core_MVC.Models.SanPham", "SanPham")
+                        .WithMany("SanPhamChiTiets")
+                        .HasForeignKey("SanPhamMaSP")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("KichCo");
+
+                    b.Navigation("SanPham");
+                });
+
+            modelBuilder.Entity("Website_ASP.NET_Core_MVC.Models.DanhMuc", b =>
+                {
+                    b.Navigation("SanPhams");
+                });
+
+            modelBuilder.Entity("Website_ASP.NET_Core_MVC.Models.HoaDon", b =>
+                {
+                    b.Navigation("ChiTietHoaDons");
+                });
+
+            modelBuilder.Entity("Website_ASP.NET_Core_MVC.Models.KichCo", b =>
+                {
+                    b.Navigation("SanPhamChiTiets");
+                });
+
+            modelBuilder.Entity("Website_ASP.NET_Core_MVC.Models.SanPham", b =>
+                {
+                    b.Navigation("SanPhamChiTiets");
+                });
+
+            modelBuilder.Entity("Website_ASP.NET_Core_MVC.Models.SanPhamChiTiet", b =>
+                {
+                    b.Navigation("ChiTietHoaDons");
                 });
 #pragma warning restore 612, 618
         }

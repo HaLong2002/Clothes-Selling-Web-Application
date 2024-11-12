@@ -28,6 +28,8 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
+            //return RedirectToAction("Index", "Home");
+
             if (returnUrl != null)
             {
                 return LocalRedirect(returnUrl);
@@ -36,7 +38,7 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
             {
                 // This needs to be a redirect so that the browser performs a new
                 // request and the identity for the user gets updated.
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Home", new { area = "" });
             }
         }
     }

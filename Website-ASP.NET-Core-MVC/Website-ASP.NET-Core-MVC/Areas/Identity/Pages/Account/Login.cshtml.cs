@@ -83,18 +83,19 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-				//var user = await _userManager.FindByEmailAsync(Input.Email);
+                //var user = await _userManager.FindByEmailAsync(Input.Email);
 
-				//// Check if the user exists and if the email is confirmed
-				//if (user != null && !await _userManager.IsEmailConfirmedAsync(user))
-				//{
-				//	IsUnconfirmedEmail = true; // Set the flag
-				//	return Page();
-				//}
+                //// Check if the user exists and if the email is confirmed
+                //if (user != null && !await _userManager.IsEmailConfirmedAsync(user))
+                //{
+                //	IsUnconfirmedEmail = true; // Set the flag
+                //	return Page();
+                //}
 
-				// This doesn't count login failures towards account lockout
-				// To enable password failures to trigger account lockout, set lockoutOnFailure: true
-				var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: true);
+                // This doesn't count login failures towards account lockout
+                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+                var username = Input.Email;
+                var result = await _signInManager.PasswordSignInAsync(username, Input.Password, Input.RememberMe, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");

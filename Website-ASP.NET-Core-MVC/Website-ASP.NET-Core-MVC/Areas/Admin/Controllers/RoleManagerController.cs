@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 {
-    //[Area("Admin")]
+    [Area("Admin")]
 	[Authorize(Roles = "Admin")]
 	public class RoleManagerController : Controller
     {

@@ -1,0 +1,6 @@
+﻿@model IEnumerable<Website_ASP.NET_Core_MVC.Models.KichCo>
+@foreach (var item in Model)
+{
+    <option id="kichco-soluong-@item.MaKichCo">@item.TenKichCo</option>
+}
+

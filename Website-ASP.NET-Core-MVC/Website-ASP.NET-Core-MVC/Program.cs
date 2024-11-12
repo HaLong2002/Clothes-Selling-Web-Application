@@ -66,6 +66,16 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 
+builder.Services.AddDistributedMemoryCache(); // Use in-memory cache for session
+builder.Services.AddSession(options =>
+{
+	options.IdleTimeout = TimeSpan.FromMinutes(30); // Set session timeout
+	options.Cookie.HttpOnly = true; // Set session cookie options
+	options.Cookie.IsEssential = true; // Make the session cookie essential for the app
+});
+
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>(); // Add HttpContextAccessor for accessing session
+
 var app = builder.Build();
 
 // Role Seeding (Add this part after app.Build())
@@ -100,19 +110,21 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseSession();
+
 app.UseAuthorization();
 
 app.MapRazorPages();
 
 app.MapControllerRoute(
       name: "areas",
-      pattern: "{area:exists}/{controller=UserManager}/{action=Index}/{id?}"
+      pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
     );
 
-app.MapAreaControllerRoute(
-    name: "MyAreaAdmin",
-    areaName: "Admin",
-    pattern: "Admin/{controller=RoleManager}/{action=Index}/{id?}");
+//app.MapAreaControllerRoute(
+//    name: "MyAreaAdmin",
+//    areaName: "Admin",
+//    pattern: "Admin/{controller=RoleManager}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",
