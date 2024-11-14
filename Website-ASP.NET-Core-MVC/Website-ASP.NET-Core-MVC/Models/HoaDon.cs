@@ -15,6 +15,7 @@ namespace Website_ASP.NET_Core_MVC.Models
 		[Key]
 		public int MaHD { get; set; }
 
+		[Required]
 		public string MaTK { get; set; }
 
 		public DateTime NgayDat { get; set; }
@@ -44,6 +45,7 @@ namespace Website_ASP.NET_Core_MVC.Models
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
 		public virtual ICollection<ChiTietHoaDon> ChiTietHoaDons { get; set; }
 
-		public virtual User User { get; set; }
+        [ForeignKey("MaTK")]
+        public virtual User User { get; set; }
 	}
 }

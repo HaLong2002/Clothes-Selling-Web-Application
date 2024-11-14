@@ -24,9 +24,19 @@ namespace Website_ASP.NET_Core_MVC.Controllers
             List<HoaDon> list = new List<HoaDon>();
             var tk = await _userManager.GetUserAsync(User);
 
-            list = _context.HoaDons.Where(p => p.MaTK == tk.Id).OrderByDescending(x => x.NgayDat).ToList();
+            if (tk == null || tk.Id == null)
+            {
+                return View("Error");
+            }
+
+            list = _context.HoaDons
+                            .Where(p => p.MaTK == tk.Id)  // Ensure NgayDat is not null
+                            .OrderByDescending(x => x.NgayDat)
+                            .ToList();
+
             return View(list);
         }
+
 
         [HttpGet]
         public async Task<ActionResult> Details(int id)
@@ -36,26 +46,33 @@ namespace Website_ASP.NET_Core_MVC.Controllers
             {
                 return View("PageNotFound");
             }
-            else
+
+            if (_context.HoaDons.FirstOrDefault(x => x.MaTK == tk.Id) == null)
             {
-                if (_context.HoaDons.FirstOrDefault(x => x.MaTK == tk.Id) == null)
-                {
-                    return View("PageNotFound");
-                }
+                return View("PageNotFound");
             }
-            HoaDon hd = _context.HoaDons.Include("User").Include(x => x.ChiTietHoaDons.Select(y => y.SanPhamChiTiet.SanPham))
-                .Include(x => x.ChiTietHoaDons.Select(y => y.SanPhamChiTiet.KichCo))
-                .Where(x => x.MaHD == id).FirstOrDefault();
+
+            HoaDon hd = _context.HoaDons
+                .Include(x => x.ChiTietHoaDons)
+                .ThenInclude(x => x.SanPhamChiTiet)
+                .ThenInclude(x => x.SanPham)
+                .Include(x => x.ChiTietHoaDons)
+                .ThenInclude(x => x.SanPhamChiTiet)
+                .ThenInclude(x => x.KichCo)
+                .Where(x => x.MaHD == id)
+                .FirstOrDefault();
+
             return View(hd);
         }
 
         [HttpPost]
-        public JsonResult CreateBill(HoaDon hd)
+        public JsonResult CreateBill([FromBody] HoaDon hd)
         {
             try
             {
                 hd.NgayDat = DateTime.Now;
                 hd.NgaySua = DateTime.Now;
+                hd.NguoiSua = "";
                 hd.TrangThai = 1;
                 _context.HoaDons.Add(hd);
                 _context.SaveChanges();
@@ -63,7 +80,9 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 
                 List<ChiTietHoaDon> list = string.IsNullOrEmpty(cartJson)
                                 ? new List<ChiTietHoaDon>()
-                                : JsonConvert.DeserializeObject<List<ChiTietHoaDon>>(cartJson); foreach (ChiTietHoaDon item in list)
+                                : JsonConvert.DeserializeObject<List<ChiTietHoaDon>>(cartJson);
+
+                foreach (ChiTietHoaDon item in list)
                 {
                     item.MaHD = hd.MaHD;
                     _context.ChiTietHoaDons.Add(item);

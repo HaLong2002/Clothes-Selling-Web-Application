@@ -39,7 +39,7 @@ namespace Website_ASP.NET_Core_MVC.Data
 
                 // User relationship
                 entity.HasOne(d => d.User)
-                    .WithMany()
+                    .WithMany(u => u.HoaDons)  // Ensure User has a collection of HoaDons
                     .HasForeignKey(d => d.MaTK)
                     .HasConstraintName("FK_HoaDons_AspNetUsers");
             });

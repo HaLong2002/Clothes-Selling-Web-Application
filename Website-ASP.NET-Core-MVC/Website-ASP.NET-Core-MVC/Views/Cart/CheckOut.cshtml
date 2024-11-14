@@ -26,24 +26,24 @@
             <form class="col-lg-6 col-md-6" id="add-bill-form" onsubmit="return datHang()">
                 <div class="checkbox-form mb-sm-40">
                     <h3>Thông tin nhận hàng</h3>
-                    <input type="hidden" name="matk" value="@ViewBag.TaiKhoan.Id" />
+                    <input type="hidden" name="MaTK" value="@ViewBag.TaiKhoan.Id" />
                     <div class="row">
                         <div class="col-md-12">
                             <div class="checkout-form-list mb-30">
                                 <label>Họ tên</label>
-                                <input type="text" required placeholder="Họ tên người nhận" name="hotennguoinhan" value="@ViewBag.TaiKhoan.FullName" />
+                                <input type="text" required placeholder="Họ tên người nhận" name="HoTenNguoiNhan" value="@ViewBag.TaiKhoan.FullName" />
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="checkout-form-list mb-30">
                                 <label>Số điện thoại</label>
-                                <input type="text" required placeholder="Số điện thoại người nhận" name="sodienthoainhan" value="@ViewBag.TaiKhoan.PhoneNumber" />
+                                <input type="text" required placeholder="Số điện thoại người nhận" name="SoDienThoaiNhan" value="@ViewBag.TaiKhoan.PhoneNumber" />
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="checkout-form-list mb-30">
                                 <label>Địa chỉ</label>
-                                <input type="text" name="diachinhan" required placeholder="Địa chỉ người nhận" value="@ViewBag.TaiKhoan.Address" />
+                                <input type="text" name="DiaChiNhan" required placeholder="Địa chỉ người nhận" value="@ViewBag.TaiKhoan.Address" />
                             </div>
                         </div>
 
@@ -52,7 +52,7 @@
                         <div class="order-notes">
                             <div class="checkout-form-list">
                                 <label>Ghi chú</label>
-                                <textarea id="checkout-mess" cols="30" name="ghichu" rows="10" placeholder="Ghi chú cho đơn hàng của bạn"></textarea>
+                                <textarea id="checkout-mess" cols="30" name="GhiChu" rows="10" placeholder="Ghi chú cho đơn hàng của bạn"></textarea>
                             </div>
                         </div>
                     </div>

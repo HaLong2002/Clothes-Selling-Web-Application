@@ -436,10 +436,17 @@
 												<span><strong style="font-size: 12px;">@currentUser.FullName</strong></span>
 											</a>
 											<ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-												<li>@Html.ActionLink("Đơn hàng của bạn", "ListBills", "Bill", null, new { @class = "dropdown-item" })</li>
-												<li>@Html.ActionLink("Thông tin tài khoản", "UserInfor", "AccountUser", new { id = currentUser.Id }, new { @class = "dropdown-item" })</li>
-												<li>@Html.ActionLink("Đổi mật khẩu", "ChangePassWord", "AccountUser", null, new { @class = "dropdown-item" })</li>
-												<li><a class="dropdown-item" href="@Url.Action("Logout","Home")">Đăng xuất</a></li>
+												<li class="dropdown-item" style="height: auto;">
+													@Html.ActionLink("Đơn hàng của bạn", "ListBills", "Bill", new { area = "" }, new { @class = "nav-link btn btn-link text-dark" })
+												</li>
+												<li class="dropdown-item" style="height: auto;">
+													<a class="nav-link btn btn-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Quản lý tài khoản của bạn">Thông tin tài khoản</a>
+												</li>
+												<li class="dropdown-item" style="height: auto;">
+													<form class="d-inline-block" asp-area="Identity" asp-page="/Account/Logout" method="post" id="logoutForm">
+														<button type="submit" class="nav-link btn btn-link text-dark" style="padding: 0.5rem 1rem;">Đăng xuất</button>
+													</form>
+												</li>
 											</ul>
 										</li>
 									}
@@ -479,7 +486,7 @@
 										<!-- Home Version Dropdown Start -->
 										<ul class="ht-dropdown dropdown-style-two">
 											@{
-												//Html.RenderAction("DropdownCategories", "Home");
+			//Html.RenderAction("DropdownCategories", "Home");
 												@await Component.InvokeAsync("DropdownCategories")
 											}
 										</ul>
@@ -501,7 +508,7 @@
 											<!-- Mobile Menu Dropdown Start -->
 											<ul>
 												@{
-													//Html.RenderAction("DropdownCategories", "Home");
+			//Html.RenderAction("DropdownCategories", "Home");
 													@await Component.InvokeAsync("DropdownCategories")
 												}
 											</ul>
