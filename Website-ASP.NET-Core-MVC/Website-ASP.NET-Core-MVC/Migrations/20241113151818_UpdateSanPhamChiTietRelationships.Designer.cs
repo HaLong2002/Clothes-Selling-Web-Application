@@ -12,8 +12,8 @@ using Website_ASP.NET_Core_MVC.Data;
 namespace Website_ASP.NET_Core_MVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241112155249_AddForeignKeyForSanPham")]
-    partial class AddForeignKeyForSanPham
+    [Migration("20241113151818_UpdateSanPhamChiTietRelationships")]
+    partial class UpdateSanPhamChiTietRelationships
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -367,16 +367,10 @@ namespace Website_ASP.NET_Core_MVC.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IDCTSP"));
 
-                    b.Property<int>("KichCoMaKichCo")
-                        .HasColumnType("int");
-
                     b.Property<int>("MaKichCo")
                         .HasColumnType("int");
 
                     b.Property<int>("MaSP")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SanPhamMaSP")
                         .HasColumnType("int");
 
                     b.Property<int>("SoLuong")
@@ -384,9 +378,9 @@ namespace Website_ASP.NET_Core_MVC.Migrations
 
                     b.HasKey("IDCTSP");
 
-                    b.HasIndex("KichCoMaKichCo");
+                    b.HasIndex("MaKichCo");
 
-                    b.HasIndex("SanPhamMaSP");
+                    b.HasIndex("MaSP");
 
                     b.ToTable("SanPhamChiTiet");
                 });
@@ -566,13 +560,13 @@ namespace Website_ASP.NET_Core_MVC.Migrations
                 {
                     b.HasOne("Website_ASP.NET_Core_MVC.Models.KichCo", "KichCo")
                         .WithMany("SanPhamChiTiets")
-                        .HasForeignKey("KichCoMaKichCo")
+                        .HasForeignKey("MaKichCo")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Website_ASP.NET_Core_MVC.Models.SanPham", "SanPham")
                         .WithMany("SanPhamChiTiets")
-                        .HasForeignKey("SanPhamMaSP")
+                        .HasForeignKey("MaSP")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

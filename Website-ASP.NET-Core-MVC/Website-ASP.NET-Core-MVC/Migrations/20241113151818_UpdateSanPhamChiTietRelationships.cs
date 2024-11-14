@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Website_ASP.NET_Core_MVC.Migrations
 {
     /// <inheritdoc />
-    public partial class AddNewTables : Migration
+    public partial class UpdateSanPhamChiTietRelationships : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -34,7 +34,7 @@ namespace Website_ASP.NET_Core_MVC.Migrations
                 {
                     MaHD = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    MaTK = table.Column<int>(type: "int", nullable: false),
+                    MaTK = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NgayDat = table.Column<DateTime>(type: "datetime2", nullable: false),
                     GhiChu = table.Column<string>(type: "ntext", nullable: false),
                     TrangThai = table.Column<int>(type: "int", nullable: false),
@@ -85,15 +85,14 @@ namespace Website_ASP.NET_Core_MVC.Migrations
                     NgaySua = table.Column<DateTime>(type: "datetime2", nullable: false),
                     NguoiSua = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     MaMau = table.Column<string>(type: "char(10)", unicode: false, fixedLength: true, maxLength: 10, nullable: false),
-                    HinhAnh = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    DanhMucMaDM = table.Column<int>(type: "int", nullable: false)
+                    HinhAnh = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SanPham", x => x.MaSP);
                     table.ForeignKey(
-                        name: "FK_SanPham_DanhMuc_DanhMucMaDM",
-                        column: x => x.DanhMucMaDM,
+                        name: "FK_SanPham_DanhMuc_MaDM",
+                        column: x => x.MaDM,
                         principalTable: "DanhMuc",
                         principalColumn: "MaDM",
                         onDelete: ReferentialAction.Cascade);
@@ -107,22 +106,20 @@ namespace Website_ASP.NET_Core_MVC.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MaSP = table.Column<int>(type: "int", nullable: false),
                     MaKichCo = table.Column<int>(type: "int", nullable: false),
-                    SoLuong = table.Column<int>(type: "int", nullable: false),
-                    KichCoMaKichCo = table.Column<int>(type: "int", nullable: false),
-                    SanPhamMaSP = table.Column<int>(type: "int", nullable: false)
+                    SoLuong = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SanPhamChiTiet", x => x.IDCTSP);
                     table.ForeignKey(
-                        name: "FK_SanPhamChiTiet_KichCo_KichCoMaKichCo",
-                        column: x => x.KichCoMaKichCo,
+                        name: "FK_SanPhamChiTiet_KichCo_MaKichCo",
+                        column: x => x.MaKichCo,
                         principalTable: "KichCo",
                         principalColumn: "MaKichCo",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_SanPhamChiTiet_SanPham_SanPhamMaSP",
-                        column: x => x.SanPhamMaSP,
+                        name: "FK_SanPhamChiTiet_SanPham_MaSP",
+                        column: x => x.MaSP,
                         principalTable: "SanPham",
                         principalColumn: "MaSP",
                         onDelete: ReferentialAction.Cascade);
@@ -165,19 +162,19 @@ namespace Website_ASP.NET_Core_MVC.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SanPham_DanhMucMaDM",
+                name: "IX_SanPham_MaDM",
                 table: "SanPham",
-                column: "DanhMucMaDM");
+                column: "MaDM");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SanPhamChiTiet_KichCoMaKichCo",
+                name: "IX_SanPhamChiTiet_MaKichCo",
                 table: "SanPhamChiTiet",
-                column: "KichCoMaKichCo");
+                column: "MaKichCo");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SanPhamChiTiet_SanPhamMaSP",
+                name: "IX_SanPhamChiTiet_MaSP",
                 table: "SanPhamChiTiet",
-                column: "SanPhamMaSP");
+                column: "MaSP");
         }
 
         /// <inheritdoc />

@@ -12,8 +12,8 @@ using Website_ASP.NET_Core_MVC.Data;
 namespace Website_ASP.NET_Core_MVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241112061517_AddNewTables")]
-    partial class AddNewTables
+    [Migration("20241114075634_AddForeignKeyMaTKToHoaDon")]
+    partial class AddForeignKeyMaTKToHoaDon
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -238,8 +238,9 @@ namespace Website_ASP.NET_Core_MVC.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("MaTK")
-                        .HasColumnType("int");
+                    b.Property<string>("MaTK")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("NgayDat")
                         .HasColumnType("datetime2");
@@ -254,9 +255,9 @@ namespace Website_ASP.NET_Core_MVC.Migrations
 
                     b.Property<string>("SoDienThoaiNhan")
                         .IsRequired()
-                        .HasMaxLength(11)
+                        .HasMaxLength(15)
                         .IsUnicode(false)
-                        .HasColumnType("char(11)")
+                        .HasColumnType("char(15)")
                         .IsFixedLength();
 
                     b.Property<int>("TrangThai")
@@ -266,6 +267,8 @@ namespace Website_ASP.NET_Core_MVC.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("MaHD");
+
+                    b.HasIndex("MaTK");
 
                     b.HasIndex("UserId");
 
@@ -302,9 +305,6 @@ namespace Website_ASP.NET_Core_MVC.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("DanhMucMaDM")
-                        .HasColumnType("int");
 
                     b.Property<decimal>("Gia")
                         .HasPrecision(19, 4)
@@ -356,7 +356,7 @@ namespace Website_ASP.NET_Core_MVC.Migrations
 
                     b.HasKey("MaSP");
 
-                    b.HasIndex("DanhMucMaDM");
+                    b.HasIndex("MaDM");
 
                     b.ToTable("SanPham");
                 });
@@ -369,16 +369,10 @@ namespace Website_ASP.NET_Core_MVC.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IDCTSP"));
 
-                    b.Property<int>("KichCoMaKichCo")
-                        .HasColumnType("int");
-
                     b.Property<int>("MaKichCo")
                         .HasColumnType("int");
 
                     b.Property<int>("MaSP")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SanPhamMaSP")
                         .HasColumnType("int");
 
                     b.Property<int>("SoLuong")
@@ -386,9 +380,9 @@ namespace Website_ASP.NET_Core_MVC.Migrations
 
                     b.HasKey("IDCTSP");
 
-                    b.HasIndex("KichCoMaKichCo");
+                    b.HasIndex("MaKichCo");
 
-                    b.HasIndex("SanPhamMaSP");
+                    b.HasIndex("MaSP");
 
                     b.ToTable("SanPhamChiTiet");
                 });
@@ -548,6 +542,13 @@ namespace Website_ASP.NET_Core_MVC.Migrations
                 {
                     b.HasOne("Website_ASP.NET_Core_MVC.Models.User", "User")
                         .WithMany()
+                        .HasForeignKey("MaTK")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_HoaDons_AspNetUsers");
+
+                    b.HasOne("Website_ASP.NET_Core_MVC.Models.User", null)
+                        .WithMany("HoaDons")
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
@@ -557,7 +558,7 @@ namespace Website_ASP.NET_Core_MVC.Migrations
                 {
                     b.HasOne("Website_ASP.NET_Core_MVC.Models.DanhMuc", "DanhMuc")
                         .WithMany("SanPhams")
-                        .HasForeignKey("DanhMucMaDM")
+                        .HasForeignKey("MaDM")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -568,13 +569,13 @@ namespace Website_ASP.NET_Core_MVC.Migrations
                 {
                     b.HasOne("Website_ASP.NET_Core_MVC.Models.KichCo", "KichCo")
                         .WithMany("SanPhamChiTiets")
-                        .HasForeignKey("KichCoMaKichCo")
+                        .HasForeignKey("MaKichCo")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Website_ASP.NET_Core_MVC.Models.SanPham", "SanPham")
                         .WithMany("SanPhamChiTiets")
-                        .HasForeignKey("SanPhamMaSP")
+                        .HasForeignKey("MaSP")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -606,6 +607,11 @@ namespace Website_ASP.NET_Core_MVC.Migrations
             modelBuilder.Entity("Website_ASP.NET_Core_MVC.Models.SanPhamChiTiet", b =>
                 {
                     b.Navigation("ChiTietHoaDons");
+                });
+
+            modelBuilder.Entity("Website_ASP.NET_Core_MVC.Models.User", b =>
+                {
+                    b.Navigation("HoaDons");
                 });
 #pragma warning restore 612, 618
         }

@@ -27,8 +27,10 @@ namespace Website_ASP.NET_Core_MVC.Models
 		[JsonIgnore]
 		public virtual ICollection<ChiTietHoaDon> ChiTietHoaDons { get; set; }
 
+		[ForeignKey("MaKichCo")]
 		public virtual KichCo KichCo { get; set; }
 
+		[ForeignKey("MaSP")]
 		[JsonIgnore]
 		public virtual SanPham SanPham { get; set; }
 	}

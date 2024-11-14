@@ -19,11 +19,16 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 		}
 
 		//[Authorize]
-		public IActionResult Index()
-		{
-			return View();
-		}
+		//public IActionResult Index()
+		//{
+		//	return View();
+		//}
 
-
-	}
+        public ActionResult Index()
+        {
+            ViewBag.SanPhamMoi = _context.SanPhams.Select(p => p).OrderByDescending(p => p.NgayTao).Take(5);
+            ViewBag.GiaTot = _context.SanPhams.Select(p => p).OrderBy(p => p.Gia).Take(5);
+            return View();
+        }
+    }
 }

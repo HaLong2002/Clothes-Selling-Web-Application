@@ -8,10 +8,12 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 {
     public class ProductController : Controller
     {
+        private readonly ILogger<ProductController> _logger;
         private readonly ApplicationDbContext _context;
 
-        public ProductController(ApplicationDbContext context)
+        public ProductController(ILogger<ProductController> logger, ApplicationDbContext context)
         {
+            _logger = logger;
             _context = context;
         }        
 
@@ -35,8 +37,11 @@ namespace Website_ASP.NET_Core_MVC.Controllers
         public ActionResult ProductDetail(int id)
         {
             SanPham sp = _context.SanPhams.Include("DanhMuc").Where(s => s.MaSP.Equals(id)).FirstOrDefault();
-            List<SanPhamChiTiet> list = _context.SanPhamChiTiets.Include("KichCo").Where(s => s.MaSP.Equals(id)).ToList();
-            ViewBag.SPCT = list;
+			List<SanPhamChiTiet> list = _context.SanPhamChiTiets
+				.Include(spct => spct.KichCo)
+				.Where(s => s.MaSP == id)
+				.ToList();
+			ViewBag.SPCT = list;
             ViewBag.Exitst = list[0];
             return View(sp);
         }
@@ -44,12 +49,27 @@ namespace Website_ASP.NET_Core_MVC.Controllers
         [HttpPost]
         public JsonResult Index(int id)
         {
-            SanPham sp = _context.SanPhams
-                                 .Include(s => s.DanhMuc)
-                                 .Include(s => s.SanPhamChiTiets)
-                                 .FirstOrDefault(s => s.MaSP == id);
+            try
+            {
+                var sp = _context.SanPhams
+                                .Include(s => s.DanhMuc)
+                                .Include(s => s.SanPhamChiTiets)
+                                .FirstOrDefault(s => s.MaSP == id);
 
-            return Json(sp);
+                if (sp == null)
+                {
+                    _logger.LogWarning($"Không tìm thấy sản phẩm với ID: {id}");
+                    return Json(new { error = "Không tìm thấy sản phẩm" });
+                }
+
+                _logger.LogInformation($"Đã tải sản phẩm ID: {id}, MaDM: {sp.MaDM}");
+                return Json(sp);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Lỗi khi tải sản phẩm ID {id}: {ex.Message}");
+                return Json(new { error = "Có lỗi xảy ra" });
+            }
         }
 
 

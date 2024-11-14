@@ -14,5 +14,8 @@ namespace Website_ASP.NET_Core_MVC.Models
 		public DateTime? Date { get; set; }
 		public string? Address { get; set; }
 		public string? Image { get; set; }
+
+        public virtual ICollection<HoaDon> HoaDons { get; set; }
+
     }
 }

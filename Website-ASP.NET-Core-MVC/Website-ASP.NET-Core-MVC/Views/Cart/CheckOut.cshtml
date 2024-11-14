@@ -20,31 +20,30 @@
 </div>
 <!-- Breadcrumb End -->
 <div class="checkout-area pb-100 pt-15 pb-sm-60">
-    var user = await _userManager.GetUserAsync(User);
 
     <div class="container">
         <div class="row">
             <form class="col-lg-6 col-md-6" id="add-bill-form" onsubmit="return datHang()">
                 <div class="checkbox-form mb-sm-40">
                     <h3>Thông tin nhận hàng</h3>
-                    <input type="hidden" name="matk" value="@ViewBag.TaiKhoan.MaTK" />
+                    <input type="hidden" name="matk" value="@ViewBag.TaiKhoan.Id" />
                     <div class="row">
                         <div class="col-md-12">
                             <div class="checkout-form-list mb-30">
                                 <label>Họ tên</label>
-                                <input type="text" required placeholder="Họ tên người nhận" name="hotennguoinhan" value="@ViewBag.TaiKhoan.HoTen" />
+                                <input type="text" required placeholder="Họ tên người nhận" name="hotennguoinhan" value="@ViewBag.TaiKhoan.FullName" />
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="checkout-form-list mb-30">
                                 <label>Số điện thoại</label>
-                                <input type="text" required placeholder="Số điện thoại người nhận" name="sodienthoainhan" value="@ViewBag.TaiKhoan.SoDienThoai" />
+                                <input type="text" required placeholder="Số điện thoại người nhận" name="sodienthoainhan" value="@ViewBag.TaiKhoan.PhoneNumber" />
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="checkout-form-list mb-30">
                                 <label>Địa chỉ</label>
-                                <input type="text" name="diachinhan" required placeholder="Địa chỉ người nhận" value="@ViewBag.TaiKhoan.DiaChi" />
+                                <input type="text" name="diachinhan" required placeholder="Địa chỉ người nhận" value="@ViewBag.TaiKhoan.Address" />
                             </div>
                         </div>
 

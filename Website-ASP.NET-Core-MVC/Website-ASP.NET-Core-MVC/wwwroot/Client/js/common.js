@@ -5,24 +5,31 @@ function loadSanPham(id) {
         data: { "id": id },
         url: '/Product/Index',
         success: function (response) {
-            $("#modal-a-hinhanh").attr("href", response.HinhAnh);
-            $("#modal-hinhanh").attr("src", response.HinhAnh);
-            $("#modal-tensp").html(response.TenSP);
-            $("#modal-danhmuc").html(response.DanhMuc.TenDanhMuc);
-            $("#modal-gia").html(response.Gia.toLocaleString('it-IT', { style: 'currency', currency: 'VND' }));
-            $("#modal-mamau").val(response.MaMau.trim());
-            $.each(response.SanPhamChiTiets, function (index) {
-                $("#kichco-soluong-" + response.SanPhamChiTiets[index].MaKichCo).val(response.SanPhamChiTiets[index].IDCTSP);
-            })
-            if (response.SanPhamChiTiets[0].SoLuong == 0) {
-                $("#order-text").html("Hết hàng ! Hãy chọn kích cỡ khác");
-                $("#order-text").attr("disabled", "disabled");
+            console.log("Response from server:", response);  // Moved inside success callback
+
+            if (response) {
+                $("#modal-a-hinhanh").attr("href", response.hinhAnh);
+                $("#modal-hinhanh").attr("src", response.hinhAnh);
+                $("#modal-tensp").html(response.tenSP);
+                $("#modal-danhmuc").html(response.danhMuc.tenDanhMuc);
+                $("#modal-gia").html(response.gia.toLocaleString('it-IT', { style: 'currency', currency: 'VND' }));
+                $("#modal-mamau").val(response.maMau ? response.maMau.trim() : '');
+                $.each(response.sanPhamChiTiets, function (index) {
+                    $("#kichco-soluong-" + response.sanPhamChiTiets[index].maKichCo).val(response.sanPhamChiTiets[index].idctsp);
+                })
+                if (response.sanPhamChiTiets[0].soLuong == 0) {
+                    $("#order-text").html("Hết hàng ! Hãy chọn kích cỡ khác");
+                    $("#order-text").attr("disabled", "disabled");
+                }
             }
         },
-        error: function (response) {
-            //debugger;  
-            console.log(xhr.responseText);
-            alert("Error has occurred..");
+        error: function (xhr, status, error) {
+            console.error("Chi tiết các lỗi:", {
+                status: status,
+                error: error,
+                response: xhr.responseText
+            });
+            alert("Có lỗi xảy ra khi tải thông tin sản phẩm");
         }
     });
 }
@@ -35,7 +42,7 @@ $(document).on("change", "#modal-kichco-soluong", function () {
         data: { "id": id },
         url: '/Product/Detail',
         success: function (response) {
-            if (response.SoLuong > 0) {
+            if (response.soLuong > 0) {
                 $("#order-text").html("Thêm vào giỏ");
                 $("#order-text").removeAttr("disabled");
             } else {
@@ -61,7 +68,10 @@ function themVaoGioHang() {
         data: JSON.stringify({ "idctsp": idctsp, "soluongmua": soluong }),
         url: '/Cart/AddToCart',
         success: function (response) {
-            if (!response.status) {
+            console.log("Cart-Response from server:", response);  // Moved inside success callback
+
+            if (!response.status)
+            {
                 swal({
                     title: "Thất bại!",
                     text: "Số lượng hàng trong kho không đủ",
