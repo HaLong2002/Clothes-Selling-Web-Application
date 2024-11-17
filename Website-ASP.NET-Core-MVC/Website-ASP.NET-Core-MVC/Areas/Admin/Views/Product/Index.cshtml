@@ -9,7 +9,6 @@
 @{
     ViewBag.Title = "Sản phẩm";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
-    //Nhom9.Models.TaiKhoanQuanTri tk = (Nhom9.Models.TaiKhoanQuanTri)HttpContext.Current.Session[Nhom9.Session.ConstaintUser.ADMIN_SESSION];
     var isAdmin = User.IsInRole("Admin");
     var info = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
 }

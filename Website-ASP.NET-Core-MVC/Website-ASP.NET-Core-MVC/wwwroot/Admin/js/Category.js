@@ -3,10 +3,11 @@ function loadData(id) {
     $.ajax({
         type: 'POST',
         data: { "id": id },
-        url: '/Category/Index',
+        url: '/Admin/Category/Index',
         success: function (response) {
-            $("#madm").val(response.MaDM);
-            $("#tendanhmuc").val(response.TenDanhMuc);
+            console.log("Response from server:", response);
+            $("#madm").val(response.maDM);
+            $("#tendanhmuc").val(response.tenDanhMuc);
         },
         error: function (response) {
             //debugger;  
@@ -24,8 +25,10 @@ function themDanhMuc() {
     $.each(formData, function (index, value) {
         data["" + value.name + ""] = value.value;
     });
+    console.log("DanhMuc:", data);
+
     $.ajax({
-        url: '/Category/Create',
+        url: '/Admin/Category/Create',
         type: 'post',
         contentType: 'application/json',
         data: JSON.stringify(data),
@@ -57,8 +60,10 @@ function suaDanhMuc() {
     $.each(formData, function (index, value) {
         data["" + value.name + ""] = value.value;
     });
+    console.log("DanhMuc:", data);
+
     $.ajax({
-        url: '/Category/Update',
+        url: '/Admin/Category/Update',
         type: 'post',
         contentType: 'application/json',
         data: JSON.stringify(data),
@@ -91,7 +96,7 @@ function xoaDanhMuc() {
     $.ajax({
         type: 'POST',
         data: { "id": id },
-        url: '/Category/Delete',
+        url: '/Admin/Category/Delete',
         success: function (response) {
             if (response.status == true) {
                 $(".cancelPopup").click();

@@ -40,9 +40,13 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> Create(DanhMuc dm)
+        public async Task<JsonResult> Create([FromBody] DanhMuc dm)
         {
-            //TaiKhoanQuanTri tk = (TaiKhoanQuanTri)Session[Nhom9.Session.ConstaintUser.ADMIN_SESSION];
+            if(dm.TenDanhMuc == null)
+            {
+                return Json(new { status = false, message = "Tên danh mục rỗng" });
+            }
+
             var tk = await _userManager.GetUserAsync(User);
             try
             {
@@ -61,7 +65,7 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> Update(DanhMuc dm)
+        public async Task<JsonResult> Update([FromBody] DanhMuc dm)
         {
             //TaiKhoanQuanTri tk = (TaiKhoanQuanTri)Session[Nhom9.Session.ConstaintUser.ADMIN_SESSION];
             var tk = await _userManager.GetUserAsync(User);

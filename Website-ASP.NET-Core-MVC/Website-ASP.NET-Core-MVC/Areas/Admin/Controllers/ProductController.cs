@@ -51,8 +51,6 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 			{
 				SanPham sp = JsonSerializer.Deserialize<SanPham>(sanpham);
                 List<SanPhamChiTiet> sanPhamChiTiets = JsonSerializer.Deserialize<List<SanPhamChiTiet>>(chiTiets);
-                _logger.LogInformation($"SanPham: {JsonSerializer.Serialize(sp)}");
-                _logger.LogInformation($"SanPhamChiTiet: {JsonSerializer.Serialize(sanPhamChiTiets)}");
 
                 var tk = await _userManager.GetUserAsync(User);
 				
@@ -81,7 +79,6 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 				_context.SanPhams.Add(sp);
 				_context.SaveChanges();
 				int masp = sp.MaSP;
-				_logger.LogInformation("Chi tiet san pham:");
 
                 foreach (SanPhamChiTiet spct in sanPhamChiTiets)
 				{
@@ -92,7 +89,6 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
                     spct.MaSP = masp;
 					_context.SanPhamChiTiets.Add(spct);
 					_context.SaveChanges();
-                    _logger.LogInformation(spct.MaSP.ToString() + spct.MaKichCo + spct.SoLuong + "\n");
                 }
                 return Json(new { status = true, message = "Thêm thành công!" });
 			}

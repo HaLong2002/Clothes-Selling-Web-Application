@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Configuration;
 using Website_ASP.NET_Core_MVC.Data;
 using Website_ASP.NET_Core_MVC.Models;
@@ -121,14 +123,15 @@ app.MapControllerRoute(
       pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
     );
 
-//app.MapAreaControllerRoute(
-//    name: "MyAreaAdmin",
-//    areaName: "Admin",
-//    pattern: "Admin/{controller=RoleManager}/{action=Index}/{id?}");
-
-app.MapControllerRoute(
+app.MapAreaControllerRoute(
     name: "default",
-    //pattern: "{controller=Customers}/{action=SignUp}/{id?}");
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    areaName: "Admin",
+    pattern: "Admin/{controller=Bill}/{action=Index}/{id?}");
+
+//app.MapControllerRoute(
+//    name: "default",
+//    //pattern: "{controller=Home}/{action=Index}/{id?}");
+//    pattern: "Admin/{ controller = Category}/{ action = Index}/{ id ?}"
+//);
 
 app.Run();
