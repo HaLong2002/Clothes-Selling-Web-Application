@@ -1,0 +1,154 @@
+﻿@model Website_ASP.NET_Core_MVC.Areas.Admin.Data.LoginAccount
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!-- Primary Meta Tags -->
+    <title>Đăng nhập - Quản trị viên</title>
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="120x120" href="~/Admin/assets/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/Admin/assets/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="~/Admin/assets/img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="~/Admin/assets/img/favicon/site.webmanifest">
+    <link rel="mask-icon" href="~/Admin/assets/img/favicon/safari-pinned-tab.svg" color="#ffffff">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Fontawesome -->
+    <link type="text/css" href="~/Admin/vendor/fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+
+    <!-- Notyf -->
+    <link type="text/css" href="~/Admin/vendor/notyf/notyf.min.css" rel="stylesheet">
+
+    <!-- Volt CSS -->
+    <link type="text/css" href="~/Admin/css/volt.css" rel="stylesheet">
+
+    <!-- NOTICE: You can use the _analytics.html partial to include production code specific code & trackers -->
+
+</head>
+
+<body class="bg-soft">
+    <main>
+        <!-- Section -->
+        <section class="vh-lg-100 d-flex align-items-center">
+            <div class="container">
+                <div class="row justify-content-center form-bg-image" data-background-lg="~/Admin/assets/img/illustrations/signin.svg">
+                    <div class="col-12 d-flex align-items-center justify-content-center">
+                        <div class="signin-inner my-3 my-lg-0 bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
+                            <div class="text-center text-md-center mb-4 mt-md-0">
+                                <h1 class="mb-0 h3">Đăng nhập</h1>
+                            </div>
+
+                            <form id="account" method="post">
+                                @* <h2 class="text-center mb-4">Đăng nhập</h2> *@
+                                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                                <div class="form-floating mb-3">
+                                    <input asp-for="@Model.Email" class="form-control" autocomplete="on" aria-required="true" placeholder="name@example.com" />
+                                    <label asp-for="@Model.Email" class="form-label">Email</label>
+                                    <span asp-validation-for="@Model.Email" class="text-danger"></span>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input asp-for="@Model.Password" class="form-control" autocomplete="on" aria-required="true" placeholder="password" />
+                                    <label asp-for="@Model.Password" class="form-label">Password</label>
+                                    <span asp-validation-for="@Model.Password" class="text-danger"></span>
+                                </div>
+                               @*  <div class="float-end mb-3">
+                                    <a id="forgot-password" asp-page="./ForgotPassword" class="text-decoration-none">Quên mật khẩu?</a>
+                                </div> *@
+                                <div class="checkbox mb-3">
+                                    <label asp-for="@Model.RememberMe" class="form-label">
+                                        <input class="form-check-input" asp-for="@Model.RememberMe" />
+                                        @Html.DisplayNameFor(m => m.RememberMe)
+                                    </label>
+                                </div>
+                                <div>
+                                    <button id="login-submit" type="submit" class="account-button">Đăng nhập</button>
+                                </div>
+                            </form>
+
+                            @* @using (Html.BeginForm("Index", "Login", FormMethod.Post, new { @class = "mt-4" }))
+                            {
+                                @Html.ValidationMessage("ErrorLogin", new { @class = "text-danger" })
+                                <br />
+                                <!-- Form -->
+                                <div class="form-group mb-4">
+                                    <label for="username">Tên đăng nhập</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text" id="basic-addon1"><span class="fas fa-envelope"></span></span>
+                                        @Html.TextBoxFor(model => model.username,
+                                                 new { @class = "form-control", @name = "username", @autoforcus = "autofocus", @required = "required", @placeholder = "Nhập tên đăng nhập" })
+                                    </div>
+                                </div>
+                                <!-- End of Form -->
+                                <div class="form-group">
+                                    <!-- Form -->
+                                    <div class="form-group mb-4">
+                                        <label for="password">Mật khẩu</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text" id="basic-addon2"><span class="fas fa-unlock-alt"></span></span>
+                                            @Html.PasswordFor(model => model.password,
+                                                     new { @class = "form-control", @name = "password", @required = "required", @placeholder = "Nhập mật khẩu" })
+                                        </div>
+                                    </div>
+                                    <!-- End of Form -->
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <div class="form-check">
+                                            @Html.CheckBoxFor(model => model.rememberme, new { @id = "defaultCheck5" })
+                                            <label class="form-check-label" for="defaultCheck5">
+                                                Nhớ mật khẩu
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-block btn-primary">Đăng nhập</button>
+                            } *@
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Core -->
+    <script src="~/Admin/vendor/popper.js/dist/umd/popper.min.js"></script>
+    <script src="~/Admin/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <!-- Vendor JS -->
+    <script src="~/Admin/vendor/onscreen/dist/on-screen.umd.min.js"></script>
+
+    <!-- Slider -->
+    <script src="~/Admin/vendor/nouislider/distribute/nouislider.min.js"></script>
+
+    <!-- Jarallax -->
+    <script src="~/Admin/vendor/jarallax/dist/jarallax.min.js"></script>
+
+    <!-- Smooth scroll -->
+    <script src="~/Admin/vendor/smooth-scroll/dist/smooth-scroll.polyfills.min.js"></script>
+
+    <!-- Count up -->
+    <script src="~/Admin/vendor/countup.js/dist/countUp.umd.js"></script>
+
+    <!-- Notyf -->
+    <script src="~/Admin/vendor/notyf/notyf.min.js"></script>
+
+    <!-- Charts -->
+    <script src="~/Admin/vendor/chartist/dist/chartist.min.js"></script>
+    <script src="~/Admin/vendor/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js"></script>
+
+    <!-- Datepicker -->
+    <script src="~/Admin/vendor/vanillajs-datepicker/dist/js/datepicker.min.js"></script>
+
+    <!-- Simplebar -->
+    <script src="~/Admin/vendor/simplebar/dist/simplebar.min.js"></script>
+
+    <!-- Github buttons -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <!-- Volt JS -->
+    <script src="~/Admin/assets/js/volt.js"></script>
+
+
+</body>
+
+</html>

@@ -6,22 +6,23 @@ function loadData(id) {
         data: { "id": id },
         url: '/Admin/Product/Index',
         success: function (response) {
-            $("#masp").val(response.MaSP);
-            $("#anhsp").attr("src", response.HinhAnh);
-            $("#tensanpham").val(response.TenSP);
-            $("#gia").val(response.Gia);
-            $("#danhmuc").val(response.MaDM);
-            $("#chatlieu").val(response.ChatLieu);
-            $("#mamau").val(response.MaMau.trim());
-            $("#displaycolor").css('backgroundColor', response.MaMau.trim());
-            $("#mota").val(response.MoTa);
-            $("#huongdan").val(response.HuongDan);
-            $.each(response.SanPhamChiTiets, function (index) {
-                $("#update-" + response.SanPhamChiTiets[index].MaKichCo).val(response.SanPhamChiTiets[index].IDCTSP);
-                $("#kichco-" + response.SanPhamChiTiets[index].MaKichCo).val(response.SanPhamChiTiets[index].SoLuong);
+            console.log("Response from server:", response);
+            $("#masp").val(response.maSP);
+            $("#anhsp").attr("src", response.hinhAnh);
+            $("#tensanpham").val(response.tenSP);
+            $("#gia").val(response.gia);
+            $("#danhmuc").val(response.maDM);
+            $("#chatlieu").val(response.chatLieu);
+            $("#mamau").val(response.maMau.trim());
+            $("#displaycolor").css('backgroundColor', response.maMau.trim());
+            $("#mota").val(response.moTa);
+            $("#huongdan").val(response.huongDan);
+            $.each(response.sanPhamChiTiets, function (index) {
+                $("#update-" + response.sanPhamChiTiets[index].maKichCo).val(response.sanPhamChiTiets[index].idctsp);
+                $("#kichco-" + response.sanPhamChiTiets[index].maKichCo).val(response.sanPhamChiTiets[index].soLuong);
             })
         },
-        error: function (response) {
+        error: function (xhr) {
             //debugger;  
             console.log(xhr.responseText);
             alert("Error has occurred..");
@@ -39,16 +40,29 @@ function themSanPham() {
     $.each(formData, function (index, value) {
         sanpham["" + value.name + ""] = value.value;
     });
+    sanpham["MaDM"] = parseInt(sanpham["MaDM"]);
+    sanpham["Gia"] = parseFloat(sanpham["Gia"]);
+    sanpham["MaKichCo"] = parseInt(sanpham["MaKichCo"]);
+    sanpham["SoLuong"] = parseInt(sanpham["SoLuong"]);
+
     $(".form-2").each(function () {
-        chitiets.push({
-            "makichco": $(this).children('input[name="makichco"]').val(),
-            "soluong": $(this).children('input[name="soluong"]').val()
-        });
+        const makichco = $(this).find('input[name="MaKichCo"]').val(); // Sửa thành .find()
+        const soluong = $(this).find('input[name="SoLuong"]').val();
+
+        // Kiểm tra giá trị hợp lệ
+        if (makichco && soluong) {
+            chitiets.push({
+                MaKichCo: parseInt(makichco, 10), // Chuyển về số nguyên
+                SoLuong: parseInt(soluong, 10),  // Chuyển về số nguyên
+            });
+        }
     })
     let image = $("#imageFile").prop("files")[0];
     form.append("sanpham", JSON.stringify(sanpham));
     form.append("chitiets", JSON.stringify(chitiets));
     form.append("hinhanh", image);
+    console.log("SanPham:", sanpham);
+    console.log("ChiTiet:", chitiets);
     $.ajax({
         url: '/Admin/Product/Create',
         type: 'POST',
@@ -69,10 +83,11 @@ function themSanPham() {
                 $("#add-message").addClass("text-danger");
             }
         },
-        error: function (response) {
-            console.log(xhr.responseText);
-            alert("Error has occurred..");
+        error: function (xhr) {
+            console.error(xhr.responseText);
+            alert("An error has occurred. Check the console for details.");
         }
+
     });
     return false;
 }
@@ -88,16 +103,30 @@ function suaSanPham() {
     $.each(formData, function (index, value) {
         sanpham["" + value.name + ""] = value.value;
     });
+    sanpham["MaSP"] = parseInt(sanpham["MaSP"]);
+    sanpham["MaDM"] = parseInt(sanpham["MaDM"]);
+    sanpham["Gia"] = parseFloat(sanpham["Gia"]);
+    sanpham["SoLuong"] = parseInt(sanpham["SoLuong"]);
+
     $(".form-update").each(function () {
-        chitiets.push({
-            "idctsp": $(this).children('input[name="idctsp"]').val(),
-            "soluong": $(this).children('input[name="soluong"]').val()
-        });
+        const idctsp = $(this).find('input[name="IDCTSP"]').val(); // Sửa thành .find()
+        const soluong = $(this).find('input[name="SoLuong"]').val();
+
+        // Kiểm tra giá trị hợp lệ
+        if (idctsp && soluong) {
+            chitiets.push({
+                IDCTSP: parseInt(idctsp, 10), // Chuyển về số nguyên
+                SoLuong: parseInt(soluong, 10),  // Chuyển về số nguyên
+            });
+        }
     })
+
     let image = $("#updateImage").prop("files")[0];
     form.append("sanpham", JSON.stringify(sanpham));
     form.append("chitiets", JSON.stringify(chitiets));
     form.append("hinhanh", image);
+    console.log("SanPham:", sanpham);
+    console.log("ChiTiet:", chitiets);
     $.ajax({
         url: '/Admin/Product/Update',
         type: 'POST',

@@ -54,7 +54,7 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
             [Display(Name = "Mật khẩu")]
             public string Password { get; set; }
 
-            [Display(Name = "Nhớ tài khoản?")]
+            [Display(Name = "Nhớ mật khẩu?")]
             public bool RememberMe { get; set; }
         }
 
