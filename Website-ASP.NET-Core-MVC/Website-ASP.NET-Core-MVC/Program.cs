@@ -97,6 +97,7 @@ using (var scope = app.Services.CreateScope())
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         await ContextSeed.SeedRolesAsync(userManager, roleManager);
         await ContextSeed.SeedAdminAsync(userManager, roleManager);
+        await ContextSeed.SeedSuperAdminAsync(userManager, roleManager);
     }
     catch (Exception ex)
     {
@@ -132,12 +133,11 @@ app.MapControllerRoute(
 //app.MapAreaControllerRoute(
 //    name: "default",
 //    areaName: "Admin",
-//    pattern: "Admin/{controller=Bill}/{action=Index}/{id?}");
+//    pattern: "{area:Admin}/{controller=Home}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",
-    //pattern: "{controller=Home}/{action=Index}/{id?}");
-    pattern: "{area:Admin}/{ controller = Home}/{ action = Index}/{ id ?}"
+    pattern: "{controller=Home}/{action=Index}/{id?}"
 );
 
 app.Run();

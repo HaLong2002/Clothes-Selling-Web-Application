@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Website_ASP.NET_Core_MVC.Areas.Admin.Data;
+using Website_ASP.NET_Core_MVC.Areas.Admin.Models;
 using Website_ASP.NET_Core_MVC.Models;
 
 namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers

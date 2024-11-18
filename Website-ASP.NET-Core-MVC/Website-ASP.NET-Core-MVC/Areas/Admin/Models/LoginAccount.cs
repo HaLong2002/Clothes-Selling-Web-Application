@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Website_ASP.NET_Core_MVC.Areas.Admin.Data
+namespace Website_ASP.NET_Core_MVC.Areas.Admin.Models
 {
     public class LoginAccount
     {

@@ -3,15 +3,17 @@ function themTaiKhoanAdmin() {
     let data = {};
     let formData = $('#add-form').serializeArray({
     });
+    console.log("Data:", data);
+
     $.each(formData, function (index, value) {
         data["" + value.name + ""] = value.value;
     });
-    if (data["matkhau"] != data["nhaplaimatkhau"]) {
+    if (data["Password"] != data["ConfirmPassword"]) {
         $("#add-message").html("Mật khẩu không khớp");
         return false;
     }
     $.ajax({
-        url: '/AdminUser/Create',
+        url: '/Admin/AdminUser/Create',
         type: 'post',
         contentType: 'application/json',
         data: JSON.stringify(data),
@@ -27,8 +29,9 @@ function themTaiKhoanAdmin() {
                 $("#add-message").addClass("text-danger");
             }
         },
-        error: function (respone) {
-            console.log(respone);
+        error: function (jqXHR) {
+            console.log("Error response:", jqXHR.responseText);
+            alert("An error occurred.");
         }
     });
     return false;
@@ -39,29 +42,43 @@ function loadData(id) {
     $.ajax({
         type: 'POST',
         data: { "id": id },
-        url: '/AdminUser/Index',
+        url: '/Admin/AdminUser/Index',
         success: function (response) {
-            $("#matk").val(response.ID);
-            $("#tendangnhap").val(response.TenDangNhap);
-            $("#hoten").val(response.HoTen);
-            if (response.LoaiTaiKhoan == true) {
+            console.log("Response from server:", response);
+
+            let item = response.taikhoansWithLockoutStatus.$values[0]; 
+           
+            // Populate the form fields with data from the response
+            $("#matk").val(item.id); // Ensure you use the correct path to the user object
+            $("#email").val(item.email);
+            $("#fullname").val(item.fullName);
+
+            // Set the radio buttons for account type
+            if (item.loaiTaiKhoan === true) {
                 $("#admin-role").prop("checked", true);
             } else {
                 $("#manager-role").prop("checked", true);
             }
-            if (response.TrangThai == true) {
-                $("#actived").prop("checked", true);
+
+            if (item.emailConfirmed === true) {
+                $("#confirmed").prop("checked", true);
             } else {
+                $("#notconfirmed").prop("checked", true);
+            }
+
+            if (item.lockoutStatus === 'Khóa') {
                 $("#blocked").prop("checked", true);
+            } else {
+                $("#active").prop("checked", true);
             }
         },
-        error: function (response) {
-            //debugger;  
-            console.log(xhr.responseText);
-            alert("Error has occurred..");
+        error: function (jqXHR) {
+            console.log("Error response:", jqXHR.responseText);
+            alert("An error occurred while loading data.");
         }
     });
 }
+
 
 //ajax sửa tài khoản quản trị
 function suaTaiKhoanQuanTri() {
@@ -71,14 +88,18 @@ function suaTaiKhoanQuanTri() {
     $.each(formData, function (index, value) {
         data["" + value.name + ""] = value.value;
     });
+    console.log("Data: ", data);
+
     $.ajax({
-        url: '/AdminUser/Update',
+        url: '/Admin/AdminUser/Update',
         type: 'post',
         contentType: 'application/json',
         data: JSON.stringify(data),
         dataType: 'json',
         success: function (respone) {
+
             $("#update-message").html(respone.message);
+
             if (respone.status == true) {
                 $("#update-message").addClass("text-warning");
                 setTimeout(function () {
@@ -106,7 +127,7 @@ function xoaTaiKhoan() {
     $.ajax({
         type: 'POST',
         data: { "id": id },
-        url: '/AdminUser/Delete',
+        url: '/Admin/AdminUser/Delete',
         success: function (response) {
             if (response.status == true) {
                 $(".cancelPopup").click();
