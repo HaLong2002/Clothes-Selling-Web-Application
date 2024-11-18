@@ -4,7 +4,6 @@
         + "/" + d.getFullYear();
 }
 
-
 function huyDonHang(id) {
     swal({
         title: "Cảnh báo",
@@ -92,7 +91,6 @@ function doiTrangThai(id) {
     });
 }
 
-
 function loadDuLieuChiTiet(id) {
     $("#hd-body").empty();
     $.ajax({
@@ -100,36 +98,62 @@ function loadDuLieuChiTiet(id) {
         data: { "id": id },
         url: '/Admin/Bill/Index',
         success: function (response) {
-            $("#hd-nguoidat").val(response.hoadon.TaiKhoanNguoiDung.HoTen);
-            $("#hd-nguoinhan").val(response.hoadon.HoTenNguoiNhan);
-            $("#hd-trangthai").val(response.hoadon.TrangThai == 0 ? "Đã hủy" :
-                (response.hoadon.TrangThai == 1) ? "Đang chuẩn bị" :
-                    (response.hoadon.TrangThai == 2) ? "Đang giao" : "Đã thanh toán");
-            $("#hd-ngaydat").val(dateFormat(new Date(parseInt((response.hoadon.NgayDat).match(/\d+/)[0]))));
-            $("#hd-sdt").val(response.hoadon.SoDienThoaiNhan);
-            $("#hd-diachi").val(response.hoadon.DiaChiNhan);
-            $("#hd-nguoisua").val(response.hoadon.NguoiSua);
-            $("#hd-ngaysua").val(dateFormat(new Date(parseInt((response.hoadon.NgaySua).match(/\d+/)[0]))));
-            $("#hd-ghichu").html(response.hoadon.GhiChu);
+            console.log("Response from server:", response);
+
+            // Basic bill information remains the same...
+            $("#hd-nguoidat").val(response.hoadon.user.fullName);
+            $("#hd-nguoinhan").val(response.hoadon.hoTenNguoiNhan);
+            $("#hd-trangthai").val(response.hoadon.trangThai == 0 ? "Đã hủy" :
+                (response.hoadon.trangThai == 1) ? "Đang chuẩn bị" :
+                    (response.hoadon.trangThai == 2) ? "Đang giao" : "Đã thanh toán");
+            $("#hd-ngaydat").val(dateFormat(new Date(response.hoadon.ngayDat)));
+            $("#hd-sdt").val(response.hoadon.soDienThoaiNhan);
+            $("#hd-diachi").val(response.hoadon.diaChiNhan);
+            $("#hd-nguoisua").val(response.hoadon.nguoiSua);
+            $("#hd-ngaysua").val(dateFormat(new Date(response.hoadon.ngaySua)));
+            $("#hd-ghichu").html(response.hoadon.ghiChu);
+
             let total = 0;
-            $.each(response.cthd, function (index) {
+            let cthdItems = response.cthd.$values;
+            let spItems = response.sp.$values;
+
+            $.each(cthdItems, function (index, item) {
+                // Debug the structure of each item
+                console.log("Item details:", item);
+                console.log("sanPhamChiTiet:", item.sanPhamChiTiet);
+
+                let giaMua = item.giaMua || 0;
+                let soLuongMua = item.soLuongMua || 0;
+                let tongTien = giaMua * soLuongMua;
+
+                // Safely access tenKichCo
+                let kichCo = "";
+                if (item.sanPhamChiTiet &&
+                    item.sanPhamChiTiet.$values &&
+                    item.sanPhamChiTiet.$values[0]) {
+                    kichCo = item.sanPhamChiTiet.$values[0].tenKichCo;
+                }
+
                 $("#hd-body").append(
-                    "<tr><td><img src=" + response.sp[index].HinhAnh + " /></td>"
-                    + "<td>" + response.sp[index].TenSP + "</td>"
-                    + "<td>" + response.cthd[index].GiaMua.toLocaleString('it-IT', { style: 'currency', currency: 'VND' }) + "</td>"
-                    + "<td>" + response.cthd[index].SoLuongMua + "</td>"
-                    + "<td>" + response.cthd[index].SanPhamChiTiet.KichCo.TenKichCo + "</td>"
-                    + "<td>" + (response.cthd[index].GiaMua * response.cthd[index].SoLuongMua).toLocaleString('it-IT', { style: 'currency', currency: 'VND' }) + "</td>"
+                    "<tr><td><img src=" + spItems[index].hinhAnh + " /></td>"
+                    + "<td>" + spItems[index].tenSP + "</td>"
+                    + "<td>" + giaMua.toLocaleString('it-IT', { style: 'currency', currency: 'VND' }) + "</td>"
+                    + "<td>" + soLuongMua + "</td>"
+                    + "<td>" + kichCo + "</td>"
+                    + "<td>" + tongTien.toLocaleString('it-IT', { style: 'currency', currency: 'VND' }) + "</td>"
                     + "</tr>"
                 );
-                total += response.cthd[index].GiaMua * response.cthd[index].SoLuongMua;
-            })
-            $("#hd-body").append("<tr><td></td><td></td><td></td><td></td><td>Tổng tiền : </td><td>" + total.toLocaleString("it-IT", { style: 'currency', currency: 'VND' }) + "</td></tr>");
+                total += tongTien;
+            });
+
+            $("#hd-body").append(
+                "<tr><td colspan='4'></td><td>Tổng tiền:</td><td>"
+                + total.toLocaleString('it-IT', { style: 'currency', currency: 'VND' }) + "</td></tr>"
+            );
         },
-        error: function (response) {
-            //debugger;  
-            console.log(xhr.responseText);
-            alert("Error has occurred..");
+        error: function (jqXHR) {
+            console.log("Error response:", jqXHR.responseText);
+            alert("An error occurred.");
         }
     });
 }

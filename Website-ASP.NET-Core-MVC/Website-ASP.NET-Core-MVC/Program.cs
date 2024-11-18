@@ -71,12 +71,18 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddDistributedMemoryCache(); // Use in-memory cache for session
 builder.Services.AddSession(options =>
 {
-	options.IdleTimeout = TimeSpan.FromMinutes(30); // Set session timeout
-	options.Cookie.HttpOnly = true; // Set session cookie options
-	options.Cookie.IsEssential = true; // Make the session cookie essential for the app
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Set session timeout
+    options.Cookie.HttpOnly = true; // Set session cookie options
+    options.Cookie.IsEssential = true; // Make the session cookie essential for the app
 });
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>(); // Add HttpContextAccessor for accessing session
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    });
 
 var app = builder.Build();
 
@@ -123,15 +129,15 @@ app.MapControllerRoute(
       pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
     );
 
-app.MapAreaControllerRoute(
-    name: "default",
-    areaName: "Admin",
-    pattern: "Admin/{controller=Bill}/{action=Index}/{id?}");
-
-//app.MapControllerRoute(
+//app.MapAreaControllerRoute(
 //    name: "default",
-//    //pattern: "{controller=Home}/{action=Index}/{id?}");
-//    pattern: "Admin/{ controller = Category}/{ action = Index}/{ id ?}"
-//);
+//    areaName: "Admin",
+//    pattern: "Admin/{controller=Bill}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+    name: "default",
+    //pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{area:Admin}/{ controller = Home}/{ action = Index}/{ id ?}"
+);
 
 app.Run();

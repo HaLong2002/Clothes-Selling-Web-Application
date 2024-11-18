@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Website_ASP.NET_Core_MVC.Data;
 using Website_ASP.NET_Core_MVC.Models;
 using X.PagedList.Extensions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 {
@@ -42,18 +43,59 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
         [HttpPost]
         public JsonResult Index(int id)
         {
-            HoaDon hd = _context.HoaDons.Include("User")
-                .Where(x => x.MaHD == id).FirstOrDefault();
-            IEnumerable<ChiTietHoaDon> chiTietHoaDons = _context.ChiTietHoaDons.Include("SanPhamChiTiet")
-                .Include("SanPhamChiTiet.KichCo")
-                .Where(x => x.MaHD == id);
-            List<SanPham> list = new List<SanPham>();
-            foreach (ChiTietHoaDon item in chiTietHoaDons)
-            {
-                list.Add(_context.SanPhams.Where(x => x.MaSP == item.SanPhamChiTiet.MaSP).FirstOrDefault());
-            }
-            return Json(new { hoadon = hd, cthd = chiTietHoaDons, sp = list });
+            // Fetch HoaDon with User data
+            var hd = _context.HoaDons
+                .Include(h => h.User)
+                .Where(h => h.MaHD == id)
+                .Select(h => new
+                {
+                    h.MaHD,
+                    h.HoTenNguoiNhan,
+                    h.TrangThai,
+                    h.NgayDat,
+                    h.SoDienThoaiNhan,
+                    h.DiaChiNhan,
+                    h.NguoiSua,
+                    h.NgaySua,
+                    h.GhiChu,
+                    User = new { h.User.FullName }
+                })
+                .FirstOrDefault();
+
+            // Fetch ChiTietHoaDons with related SanPhamChiTiet and KichCo data
+            var chiTietHoaDons = _context.ChiTietHoaDons
+                .Include(ct => ct.SanPhamChiTiet)
+                .ThenInclude(spct => spct.KichCo)
+                .Where(ct => ct.MaHD == id)
+                .Select(ct => new
+                {
+                    ct.GiaMua,
+                    ct.SoLuongMua,
+                    SanPhamChiTiet = new
+                    {
+                        ct.SanPhamChiTiet.MaSP,
+                        ct.SanPhamChiTiet.KichCo.TenKichCo
+                    }
+                })
+                .ToList();
+
+            // Fetch related SanPhams in a single query
+            var sanPhamIds = chiTietHoaDons.Select(ct => ct.SanPhamChiTiet.MaSP).Distinct();
+            var sanPhams = _context.SanPhams
+                .Where(sp => sanPhamIds.Contains(sp.MaSP))
+                .Select(sp => new
+                {
+                    sp.MaSP,
+                    sp.TenSP,
+                    sp.HinhAnh
+                })
+                .ToList();
+
+            // Return the data as JSON
+            return Json(new { hoadon = hd, cthd = chiTietHoaDons, sp = sanPhams });
         }
+
+
 
         [HttpPost]
         public async Task<JsonResult> ChangeStatus(int mahd, int stt)
@@ -68,12 +110,12 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
                 hd.NguoiSua = tk.FullName;
                 hd.NgaySua = DateTime.Now;
                 _context.SaveChanges();
-                return Json(new { status = true });
+                return Json(new { status = true, message = "Thêm thành công"});
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return Json(new { status = false });
-            }
+                return Json(new { status = false, error =  ex.Message});
+                }
         }
     }
 }

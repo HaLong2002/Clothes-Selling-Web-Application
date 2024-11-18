@@ -18,7 +18,9 @@ namespace Website_ASP.NET_Core_MVC.Models
 		[Required]
 		public string MaTK { get; set; }
 
-		public DateTime NgayDat { get; set; }
+        [DataType(DataType.Date)]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy}")]
+        public DateTime NgayDat { get; set; }
 
 		[Column(TypeName = "ntext")]
 		public string GhiChu { get; set; }
@@ -33,7 +35,9 @@ namespace Website_ASP.NET_Core_MVC.Models
 		[StringLength(11)]
 		public string SoDienThoaiNhan { get; set; }
 
-		public DateTime? NgaySua { get; set; }
+        [DataType(DataType.Date)]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy}")]
+        public DateTime? NgaySua { get; set; }
 
 		[StringLength(100)]
 		public string NguoiSua { get; set; }
