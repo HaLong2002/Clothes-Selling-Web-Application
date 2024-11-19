@@ -88,6 +88,11 @@ function suaTaiKhoanQuanTri() {
     $.each(formData, function (index, value) {
         data["" + value.name + ""] = value.value;
     });
+
+    if (data["EmailConfirmed"]) {
+        data["EmailConfirmed"] = data["EmailConfirmed"] === "true";
+    }
+
     console.log("Data: ", data);
 
     $.ajax({

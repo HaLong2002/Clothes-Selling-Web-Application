@@ -93,8 +93,9 @@
                             <div class="text-center text-md-center mb-4 mt-md-0">
                                 <h1 class="mb-0 h3 text-popup">Tạo tài khoản quản trị</h1>
                             </div>
-                            <form id="add-form" onsubmit="return themTaiKhoanAdmin()">
+                            <form id="add-form" onsubmit="return themTaiKhoanAdmin()" method="post">
                                 <!-- Form -->
+                                @* <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div> *@
                                 <p id="add-message"></p>
                                 <hr />
                                 <div class="form-group mb-2">
