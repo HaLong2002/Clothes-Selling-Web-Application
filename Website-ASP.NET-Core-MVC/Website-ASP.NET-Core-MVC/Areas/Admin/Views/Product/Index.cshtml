@@ -9,7 +9,7 @@
 @{
     ViewBag.Title = "Sản phẩm";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
-    var isAdmin = User.IsInRole("Admin");
+    var isAdmin = User.IsInRole("Admin") || User.IsInRole("SuperAdmin");
     var info = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
 }
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">

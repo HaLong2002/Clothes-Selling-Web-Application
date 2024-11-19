@@ -14,10 +14,14 @@ function loadSanPham(id) {
                 $("#modal-danhmuc").html(response.danhMuc.tenDanhMuc);
                 $("#modal-gia").html(response.gia.toLocaleString('it-IT', { style: 'currency', currency: 'VND' }));
                 $("#modal-mamau").val(response.maMau ? response.maMau.trim() : '');
-                $.each(response.sanPhamChiTiets, function (index) {
-                    $("#kichco-soluong-" + response.sanPhamChiTiets[index].maKichCo).val(response.sanPhamChiTiets[index].idctsp);
+
+                let items = response.sanPhamChiTiets.$values;
+                console.log("SanPhamChiTiet:", items);  // Moved inside success callback
+
+                $.each(items, function (index) {
+                    $("#kichco-soluong-" + items[index].maKichCo).val(items[index].idctsp);
                 })
-                if (response.sanPhamChiTiets[0].soLuong == 0) {
+                if (items[0].soLuong == 0) {
                     $("#order-text").html("Hết hàng ! Hãy chọn kích cỡ khác");
                     $("#order-text").attr("disabled", "disabled");
                 }

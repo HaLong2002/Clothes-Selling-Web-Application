@@ -127,19 +127,19 @@ function loadDuLieuChiTiet(id) {
                 let tongTien = giaMua * soLuongMua;
 
                 // Safely access tenKichCo
-                let kichCo = "";
-                if (item.sanPhamChiTiet &&
-                    item.sanPhamChiTiet.$values &&
-                    item.sanPhamChiTiet.$values[0]) {
-                    kichCo = item.sanPhamChiTiet.$values[0].tenKichCo;
-                }
+                //let kichCo = "";
+                //if (item.sanPhamChiTiet &&
+                //    item.sanPhamChiTiet.$values &&
+                //    item.sanPhamChiTiet.$values[0]) {
+                //    kichCo = item.sanPhamChiTiet.tenKichCo;
+                //}
 
                 $("#hd-body").append(
                     "<tr><td><img src=" + spItems[index].hinhAnh + " /></td>"
                     + "<td>" + spItems[index].tenSP + "</td>"
                     + "<td>" + giaMua.toLocaleString('it-IT', { style: 'currency', currency: 'VND' }) + "</td>"
                     + "<td>" + soLuongMua + "</td>"
-                    + "<td>" + kichCo + "</td>"
+                    + "<td>" + item.sanPhamChiTiet.tenKichCo + "</td>"
                     + "<td>" + tongTien.toLocaleString('it-IT', { style: 'currency', currency: 'VND' }) + "</td>"
                     + "</tr>"
                 );

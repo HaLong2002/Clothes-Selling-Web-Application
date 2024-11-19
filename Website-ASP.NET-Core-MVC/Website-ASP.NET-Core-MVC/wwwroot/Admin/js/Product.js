@@ -17,9 +17,14 @@ function loadData(id) {
             $("#displaycolor").css('backgroundColor', response.maMau.trim());
             $("#mota").val(response.moTa);
             $("#huongdan").val(response.huongDan);
-            $.each(response.sanPhamChiTiets, function (index) {
-                $("#update-" + response.sanPhamChiTiets[index].maKichCo).val(response.sanPhamChiTiets[index].idctsp);
-                $("#kichco-" + response.sanPhamChiTiets[index].maKichCo).val(response.sanPhamChiTiets[index].soLuong);
+
+            let items = response.sanPhamChiTiets.$values;
+            console.log("San Pham Chi Tiet:", items);
+
+
+            $.each(items, function (index) {
+                $("#update-" + items[index].maKichCo).val(items[index].idctsp);
+                $("#kichco-" + items[index].maKichCo).val(items[index].soLuong);
             })
         },
         error: function (xhr) {
