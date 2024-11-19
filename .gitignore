@@ -63,7 +63,7 @@ npm-debug.log
 yarn-error.log
 
 # Environment settings
-appsettings*.json
+# appsettings*.json
 .env
 .env.*
 
