@@ -8,10 +8,10 @@ function themTaiKhoanAdmin() {
     $.each(formData, function (index, value) {
         data["" + value.name + ""] = value.value;
     });
-    if (data["Password"] != data["ConfirmPassword"]) {
-        $("#add-message").html("Mật khẩu không khớp");
-        return false;
-    }
+    //if (data["Password"] != data["ConfirmPassword"]) {
+    //    $("#add-message").html("Mật khẩu không khớp");
+    //    return false;
+    //}
     $.ajax({
         url: '/Admin/AdminUser/Create',
         type: 'post',

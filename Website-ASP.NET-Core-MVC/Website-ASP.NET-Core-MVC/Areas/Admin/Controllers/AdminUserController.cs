@@ -82,49 +82,32 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 		}
 
 		[HttpPost]
-        public async Task<JsonResult> Create(CreateAccount tk)
+        public async Task<JsonResult> Create([FromBody] CreateAccount tk)
         {
-            //try
-            //{
-            //    User check = _context.TaiKhoanQuanTris.Where(a => a.TenDangNhap.Equals(tk.TenDangNhap)).FirstOrDefault();
-
-            //    if (check != null)
-            //    {
-            //        return Json(new { status = false, message = "Email đã tồn tại!" });
-            //    }
-            //    else
-            //    {
-            //        tk.TrangThai = true;
-            //        _context.TaiKhoanQuanTris.Add(tk);
-            //        _context.SaveChanges();
-            //        return Json(new { status = true, message = "Thêm thành công!" });
-            //    }
-            //}
-            //catch (Exception)
-            //{
-            //    return Json(new { status = false, message = "Thêm không thành công!" });
-            //}
-
-            var admin = new User
+            if (ModelState.IsValid)
             {
-                UserName = tk.Email,
-                Email = tk.Email,
-                FullName = tk.FullName,
-                EmailConfirmed = true,
-                //PhoneNumberConfirmed = true
-            };
-            if (_userManager.Users.All(u => u.Id != admin.Id))
-            {
-                var user = await _userManager.FindByEmailAsync(admin.Email);
-                if (user == null)
+                var admin = new User
                 {
-                    await _userManager.CreateAsync(admin, tk.Password);
-                    await _userManager.AddToRoleAsync(admin, Enums.Roles.Admin.ToString());
-                    return Json(new { status = true, message = "Thêm thành công!" });
-                }
-                else
+                    UserName = tk.Email,
+                    Email = tk.Email,
+                    FullName = tk.FullName,
+                    EmailConfirmed = true,
+                    //PhoneNumberConfirmed = true
+                };
+
+                if (_userManager.Users.All(u => u.Id != admin.Id))
                 {
-                    return Json(new { status = false, message = "Email đã tồn tại!" });
+                    var user = await _userManager.FindByEmailAsync(admin.Email);
+                    if (user == null)
+                    {
+                        await _userManager.CreateAsync(admin, tk.Password);
+                        await _userManager.AddToRoleAsync(admin, Enums.Roles.Admin.ToString());
+                        return Json(new { status = true, message = "Thêm thành công!" });
+                    }
+                    else
+                    {
+                        return Json(new { status = false, message = "Email đã tồn tại!" });
+                    }
                 }
             }
             return Json(new { status = false, message = "Thêm không thành công!" });
