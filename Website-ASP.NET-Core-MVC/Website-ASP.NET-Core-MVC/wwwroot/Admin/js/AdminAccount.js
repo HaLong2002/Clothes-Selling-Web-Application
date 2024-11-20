@@ -46,31 +46,35 @@ function loadData(id) {
         success: function (response) {
             console.log("Response from server:", response);
 
-            let item = response.taikhoansWithLockoutStatus.$values[0]; 
+            if (!response.success) {
+                alert(response.message);
+                return;
+            }
+
+            const user = response.user;
+            const allRoles = response.allRoles.$values;
            
             // Populate the form fields with data from the response
-            $("#matk").val(item.id); // Ensure you use the correct path to the user object
-            $("#email").val(item.email);
-            $("#fullname").val(item.fullName);
+            $("#matk").val(user.id); // Ensure you use the correct path to the user object
+            $("#email").val(user.email);
+            $("#fullname").val(user.fullName);
 
-            // Set the radio buttons for account type
-            if (item.loaiTaiKhoan === true) {
-                $("#admin-role").prop("checked", true);
-            } else {
-                $("#manager-role").prop("checked", true);
-            }
+            const rolesContainer = $("#roles");
+            rolesContainer.empty(); // Clear previous content
 
-            if (item.emailConfirmed === true) {
-                $("#confirmed").prop("checked", true);
-            } else {
-                $("#notconfirmed").prop("checked", true);
-            }
+            allRoles.forEach(role => {
+                const isChecked = user.roles.$values.includes(role); // Check if the user has this role
+                const checkboxHtml = `
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="${role}" id="${role}-role" ${isChecked ? 'checked' : ''}>
+                        <label class="form-check-label" for="${role}-role">${role}</label>
+                    </div>
+                `;
+                rolesContainer.append(checkboxHtml);
+            });
 
-            if (item.lockoutStatus === 'Khóa') {
-                $("#blocked").prop("checked", true);
-            } else {
-                $("#active").prop("checked", true);
-            }
+            $(`#${user.emailConfirmed ? 'confirmed' : 'notconfirmed'}`).prop("checked", true);
+            $(`#${user.lockoutStatus === "Khóa" ? 'blocked' : 'active'}`).prop("checked", true);
         },
         error: function (jqXHR) {
             console.log("Error response:", jqXHR.responseText);
@@ -79,47 +83,54 @@ function loadData(id) {
     });
 }
 
-
 //ajax sửa tài khoản quản trị
 function suaTaiKhoanQuanTri() {
     let data = {};
-    let formData = $('#update-form').serializeArray({
-    });
+    let formData = $('#update-form').serializeArray();
+
+    // Convert formData into key-value pairs
     $.each(formData, function (index, value) {
-        data["" + value.name + ""] = value.value;
+        data[value.name] = value.value;
     });
 
-    if (data["EmailConfirmed"]) {
-        data["EmailConfirmed"] = data["EmailConfirmed"] === "true";
-    }
+    data["EmailConfirmed"] = data["EmailConfirmed"] === "true";
 
-    console.log("Data: ", data);
+    // Collect roles from checkboxes
+    let roles = [];
+    $("#roles input:checked").each(function () {
+        roles.push($(this).val());
+    });
+    data["Roles"] = roles;
+
+    console.log("Data to submit: ", data);
 
     $.ajax({
         url: '/Admin/AdminUser/Update',
-        type: 'post',
+        type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(data),
         dataType: 'json',
-        success: function (respone) {
+        success: function (response) {
+            $("#update-message").html(response.message);
 
-            $("#update-message").html(respone.message);
-
-            if (respone.status == true) {
-                $("#update-message").addClass("text-warning");
+            if (response.status) {
+                $("#update-message").addClass("text-success").removeClass("text-danger");
                 setTimeout(function () {
                     window.location.replace("/Admin/AdminUser");
-                }, 1000)
+                }, 1000);
             } else {
-                $("#update-message").addClass("text-danger");
+                $("#update-message").addClass("text-danger").removeClass("text-success");
             }
         },
-        error: function (respone) {
-            console.log(respone);
+        error: function (response) {
+            console.error(response);
+            $("#update-message").html("Đã xảy ra lỗi.").addClass("text-danger");
         }
     });
-    return false;
+
+    return false; // Prevent default form submission
 }
+
 
 //load data lên form xóa
 function deleteData(id) {

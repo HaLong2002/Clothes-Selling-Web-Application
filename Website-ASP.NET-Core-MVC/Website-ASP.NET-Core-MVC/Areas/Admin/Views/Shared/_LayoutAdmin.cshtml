@@ -99,7 +99,7 @@
                                     <span>Hóa đơn</span>
                                 </a>
                             </li>
-                            @if (/*tk.LoaiTaiKhoan == true*/ User.IsInRole("Admin"))
+                            @if (/*tk.LoaiTaiKhoan == true*/ User.IsInRole("SuperAdmin"))
                             {
                                 <li class='nav-item  @(ViewContext.RouteData.Values["controller"].ToString() == "AdminUser"? "active" : "") '>
                                     <a href="@Url.Action("Index","AdminUser")" class="nav-link">

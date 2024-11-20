@@ -17,11 +17,13 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AdminUserController(ApplicationDbContext context, UserManager<User> userManager)
+        public AdminUserController(ApplicationDbContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public async Task<ActionResult> Index(string searchString, int page = 1, int pageSize = 5)
@@ -47,16 +49,15 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 
             foreach (var user in taikhoans)
             {
-                var lockoutStatus = await IsAccountLocked(user.Id) ? "Khóa" : "Không khóa";
-
                 taikhoansWithLockoutStatus.Add(new UserViewModel
                 {
                     Id = user.Id,
                     FullName = user.FullName,
                     Email = user.Email,
                     EmailConfirmed = user.EmailConfirmed,
-                    LockoutStatus = lockoutStatus
-                });
+                    LockoutStatus = await IsAccountLocked(user.Id) ? "Khóa" : "Không khóa",
+					Roles = await GetUserRoles(user)
+				});
             }
 
             var pagedTaikhoans = taikhoansWithLockoutStatus
@@ -75,7 +76,12 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
             return user.LockoutEnabled && user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow;
         }
 
-        [HttpPost]
+		private async Task<List<string>> GetUserRoles(User user)
+		{
+			return new List<string>(await _userManager.GetRolesAsync(user));
+		}
+
+		[HttpPost]
         public async Task<JsonResult> Create(CreateAccount tk)
         {
             //try
@@ -136,21 +142,27 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
                 return Json(new { success = false, message = "Không tìm thấy người dùng" });
             }
 
-            var taikhoansWithLockoutStatus = new List<UserViewModel>();
+            var allRoles = await _roleManager.Roles
+                .Where(r => r.Name != "Customer") // Exclude "Customer role"
+                .Select(r => r.Name)
+                .ToListAsync();
 
-            var lockoutStatus = await IsAccountLocked(user.Id) ? "Đã bị khóa" : "Không bị khóa";
+            var userRoles = await _userManager.GetRolesAsync(user);
 
-            taikhoansWithLockoutStatus.Add(new UserViewModel
+            return Json(new
             {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                EmailConfirmed = user.EmailConfirmed,
-                LockoutStatus = lockoutStatus
-            });            
-
-            // Return the user as JSON
-            return Json(new { success = true, taikhoansWithLockoutStatus });
+                success = true,
+                user = new
+                {
+                    Id = user.Id,
+                    FullName = user.FullName,
+                    Email = user.Email,
+                    EmailConfirmed = user.EmailConfirmed,
+                    LockoutStatus = await IsAccountLocked(user.Id) ? "Khóa" : "Không khóa",
+                    Roles = userRoles
+                },
+                allRoles // Send all available roles
+            });
         }
 
         //[HttpPost]
@@ -181,13 +193,13 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
         {
             var loginUser = await _userManager.GetUserAsync(User); // Get the currently logged-in user
 
+            if (tk == null)
+            {
+                return Json(new { status = false, message = "User null!" });
+            }
+
             try
             {
-                if(tk == null)
-                {
-                    return Json(new { status = false, message = "User null!" });
-                }
-
                 // Find the user to be updated by ID
                 var updateUser = await _userManager.FindByIdAsync(tk.Id);
 
@@ -196,10 +208,9 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
                     return Json(new { status = false, message = "Tài khoản không tồn tại!" });
                 }
 
-                // Check if the user is trying to update their own account
-                if (updateUser.Email.Equals(loginUser.Email, StringComparison.OrdinalIgnoreCase))
+                if (updateUser.Id == loginUser.Id)
                 {
-                    return Json(new { status = false, message = "Bạn không thể sửa tài khoản của chính mình!" });
+                    return Json(new { status = false, message = "Bạn không thể chỉnh sửa tài khoản của chính mình!" });
                 }
 
                 // Update user properties
@@ -214,6 +225,38 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
                     await _userManager.SetLockoutEndDateAsync(updateUser, null); // Unlock
                 }
 
+                // Update user roles (if roles are provided in the request)
+                if (tk.Roles != null && tk.Roles.Any())
+                {
+                    // Get current roles
+                    var currentRoles = await _userManager.GetRolesAsync(updateUser);
+
+                    // Determine roles to add and remove
+                    var rolesToAdd = tk.Roles.Except(currentRoles);
+                    var rolesToRemove = currentRoles.Except(tk.Roles);
+
+                    // Update roles
+                    if (rolesToRemove.Any())
+                    {
+                        var removeResult = await _userManager.RemoveFromRolesAsync(updateUser, rolesToRemove);
+                        if (!removeResult.Succeeded)
+                        {
+                            var removeErrors = string.Join("; ", removeResult.Errors.Select(e => e.Description));
+                            return Json(new { status = false, message = $"Lỗi khi xóa vai trò: {removeErrors}" });
+                        }
+                    }
+
+                    if (rolesToAdd.Any())
+                    {
+                        var addResult = await _userManager.AddToRolesAsync(updateUser, rolesToAdd);
+                        if (!addResult.Succeeded)
+                        {
+                            var addErrors = string.Join("; ", addResult.Errors.Select(e => e.Description));
+                            return Json(new { status = false, message = $"Lỗi khi thêm vai trò: {addErrors}" });
+                        }
+                    }
+                }
+
                 // Update the user with UserManager
                 var result = await _userManager.UpdateAsync(updateUser);
 
@@ -223,15 +266,14 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
                 }
 
                 // Return errors if the update failed
-                var errorMessages = string.Join("; ", result.Errors.Select(e => e.Description));
-                return Json(new { status = false, message = $"Có lỗi xảy ra: {errorMessages}" });
+                var updateErrors = string.Join("; ", result.Errors.Select(e => e.Description));
+                return Json(new { status = false, message = $"Có lỗi xảy ra: {updateErrors}" });
             }
             catch (Exception)
             {
                 return Json(new { status = false, message = "Có lỗi gì đó. Thử lại sau!" });
             }
         }
-
 
         //[HttpPost]
         //public JsonResult Delete(int id)
