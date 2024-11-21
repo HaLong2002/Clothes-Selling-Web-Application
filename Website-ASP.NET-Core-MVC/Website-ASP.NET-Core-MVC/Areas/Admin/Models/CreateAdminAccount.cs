@@ -2,7 +2,7 @@
 
 namespace Website_ASP.NET_Core_MVC.Areas.Admin.Models
 {
-    public class CreateAccount
+    public class CreateAdminAccount
     {
         [Required(ErrorMessage = "Vui lòng nhập tên của bạn")]
         [MaxLength(20, ErrorMessage = "Tối đa 20 kí tự")]
@@ -14,7 +14,11 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Models
         [Display(Name = "Email")]
         public string Email { get; set; }
 
-        [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
+		[Required(ErrorMessage = "Vui lòng chọn ít nhất một loại tài khoản")]
+		[Display(Name = "Loại tài khoản")]
+		public List<string> Roles { get; set; }
+
+		[Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
         [StringLength(100, MinimumLength = 6, ErrorMessage = "{0} phải dài từ {2} đến tối đa {1} ký tự")]
         [DataType(DataType.Password)]
         [Display(Name = "Mật khẩu")]

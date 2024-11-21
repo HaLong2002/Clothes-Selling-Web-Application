@@ -1,4 +1,5 @@
-﻿@model X.PagedList.IPagedList<Website_ASP.NET_Core_MVC.Areas.Admin.Models.UserViewModel>
+﻿@* @model Website_ASP.NET_Core_MVC.Areas.Admin.Models.AdminPageViewModel*@
+@model X.PagedList.IPagedList<Website_ASP.NET_Core_MVC.Areas.Admin.Models.AdminUserViewModel>
 @using X.PagedList.Mvc.Core
 @using X.PagedList
 <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css">
@@ -15,7 +16,7 @@
 	</div>
 	<div class="btn-toolbar mb-2 mb-md-0">
 		<div class="btn-group">
-			<button type="button" class="btn btn-sm btn-outline-primary" id="addPopup"><span class="fas fa-plus mr-2"></span>Thêm tài khoản quản trị</button>
+			<button type="button" class="btn btn-sm btn-outline-primary" onclick="loadRoles()" id="addPopup"><span class="fas fa-plus mr-2"></span>Thêm tài khoản quản trị</button>
 		</div>
 	</div>
 </div>
@@ -114,55 +115,40 @@
 								<h1 class="mb-0 h3 text-popup">Tạo tài khoản quản trị</h1>
 							</div>
 							<form id="add-form" onsubmit="return themTaiKhoanAdmin()" method="post">
-								<!-- Form -->
-								@* <div asp-validation-summary="ModelOnly" class="text-danger" role="alert" id="add-message"></div> *@
 								<p id="add-message"></p>
 								<hr />
 								<div class="form-group mb-2">
 									<label for="adminAccount">Email</label>
 									<div class="input-group">
-										<input type="text" class="form-control" name="Email" placeholder="Email" autofocus required>
+										<input type="text" name="Email" class="form-control" placeholder="Email" value="" autofocus required>
 									</div>
 								</div>
-								<!-- End of Form -->
-								<!-- Form -->
 								<div class="form-group mb-2">
 									<label for="fullName">Họ và tên</label>
 									<div class="input-group">
-										<input type="text" class="form-control" name="FullName" placeholder="Họ và tên" required>
+										<input type="text" name="FullName" class="form-control" placeholder="Họ và tên" value="" required>
 									</div>
 								</div>
-								<!-- End of Form -->
-								<!-- Form -->
 								<div class="form-group mb-2">
-									<label for="optionsAccount">Loại tài khoản</label>
-									<div class="input-group" style="display: flex; align-items: center" id="optionsAccount">
-										<input type="radio" name="loaitaikhoan" id="statusAdmin" value="true" style="margin-right: 10px" />
-										<label for="statusAdmin" style="display: contents;">Người quản trị</label>
-										<input type="radio" name="loaitaikhoan" id="statusManage" value="false" checked style="margin: 0 10px 0 20px" />
-										<label for="statusManage" style="display: contents">Quản lý</label>
+									<label>Loại tài khoản</label>
+									<div id="add-roles">
+										<!-- Roles checkboxes will be dynamically generated here -->
 									</div>
 								</div>
-								<!-- End of Form -->
-								<div class="form-group">
-									<!-- Form -->
-									<div class="form-group mb-2">
-										<label for="password">Mật khẩu</label>
-										<div class="input-group">
-											<input type="password" name="Password" placeholder="Mật khẩu" class="form-control" required>
-										</div>
-									</div>
-									<!-- End of Form -->
-									<!-- Form -->
-									<div class="form-group mb-2">
-										<label for="confirm_password">Xác nhận mật khẩu</label>
-										<div class="input-group">
-											<input type="password" name="ConfirmPassword" placeholder="Xác nhận mật khẩu" class="form-control" required>
-										</div>
+								<div class="form-group mb-2">
+									<label for="password">Mật khẩu</label>
+									<div class="input-group">
+										<input type="password" name="Password" class="form-control" placeholder="Mật khẩu" value="" required>
 									</div>
 								</div>
-								<button type="submit" class="btn btn-block btn-primary">Đăng ký</button>
-								<div class="btn btn-block border-primary cancelPopup" id="cancelPopup">Hủy</div>
+								<div class="form-group mb-2">
+									<label for="confirmpassword">Nhập lại mật khẩu</label>
+									<div class="input-group">
+										<input type="password" name="ConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu" value="" required>
+									</div>
+								</div>
+								<button type="submit" class="btn btn-block btn-secondary">Đăng ký</button>
+								<div class="btn btn-block border-primary cancelPopup">Hủy</div>
 							</form>
 						</div>
 					</div>
@@ -268,4 +254,10 @@
 
 	<script src="~/Admin/js/addPopUp.js"></script>
 	<script src="~/Admin/js/AdminAccount.js"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate-unobtrusive/3.2.13/jquery.validate.unobtrusive.min.js"></script>
+	<partial name="_ValidationScriptsPartial" />
+
 }

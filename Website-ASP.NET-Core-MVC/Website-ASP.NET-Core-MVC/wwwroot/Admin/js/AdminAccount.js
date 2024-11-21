@@ -1,40 +1,89 @@
 ﻿//Ajax thêm tài khoản
 function themTaiKhoanAdmin() {
     let data = {};
-    let formData = $('#add-form').serializeArray({
-    });
-    console.log("Data:", data);
+    let formData = $('#add-form').serializeArray();
 
+    // Collect roles
+    data['Roles'] = [];
     $.each(formData, function (index, value) {
-        data["" + value.name + ""] = value.value;
+        if (value.name === 'Roles') {
+            data['Roles'].push(value.value);
+        } else {
+            data[value.name] = value.value;
+        }
     });
-    //if (data["Password"] != data["ConfirmPassword"]) {
-    //    $("#add-message").html("Mật khẩu không khớp");
-    //    return false;
-    //}
+
+    console.log("Data da nhap khi them:", data);
+
+    // Remove the commented-out roles validation if you want to require at least one role
+    if (data['Roles'].length === 0) {
+        $("#add-message").html("Vui lòng chọn ít nhất một loại tài khoản").addClass("text-danger");
+        return false;
+    }
+
+    if (data["Password"] != data["ConfirmPassword"]) {
+        $("#add-message").html("Mật khẩu không khớp").addClass("text-danger");
+        return false;
+    }
+
+    // Rest of the code remains the same
     $.ajax({
         url: '/Admin/AdminUser/Create',
         type: 'post',
         contentType: 'application/json',
         data: JSON.stringify(data),
         dataType: 'json',
-        success: function (respone) {
-            $("#add-message").html(respone.message);
-            if (respone.status == true) {
-                $("#add-message").addClass("text-warning");
+        success: function (response) {
+            if (response.status) {
+                $("#add-message").html(response.message).addClass("text-success");
                 setTimeout(function () {
                     window.location.replace("/Admin/AdminUser");
-                }, 1000)
+                }, 1000);
             } else {
-                $("#add-message").addClass("text-danger");
+                $("#add-message").html(response.message).addClass("text-danger").removeClass("text-success");
             }
         },
         error: function (jqXHR) {
             console.log("Error response:", jqXHR.responseText);
-            alert("An error occurred.");
+            $("#add-message").html("Có lỗi xảy ra. Vui lòng thử lại.").addClass("text-danger");
         }
     });
     return false;
+}
+
+function loadRoles() {
+    $.ajax({
+        type: 'POST',
+        url: '/Admin/AdminUser/LoadRoles',
+        success: function (response) {
+            console.log("Response from server:", response);
+
+            if (!response.success) {
+                alert(response.message);
+                return;
+            }
+
+            const allRoles = response.allRoles.$values;            
+
+            const rolesContainer = $("#add-roles");
+            rolesContainer.empty(); // Clear previous content
+
+            allRoles.forEach(role => {
+                //const isChecked = user.roles.$values.includes(role); // Check if the user has this role
+                const checkboxHtml = `
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="Roles" value="${role}" id="${role}-role">
+                        <label class="form-check-label" for="${role}-role">${role}</label>
+                    </div>
+                `;
+                rolesContainer.append(checkboxHtml);
+            });
+        },
+        error: function (jqXHR) {
+            console.log("Error response:", jqXHR.responseText);
+            alert("An error occurred while loading data.");
+        }
+    });
 }
 
 //load dữ liệu lên form sửa
