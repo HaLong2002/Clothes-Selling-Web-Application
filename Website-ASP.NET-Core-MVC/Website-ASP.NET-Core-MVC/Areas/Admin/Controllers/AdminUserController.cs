@@ -182,7 +182,7 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 
 			if (tk == null)
 			{
-				return Json(new { status = false, message = "User null!" });
+				return Json(new { status = false, message = "Không tìm thấy người dùng!" });
 			}
 
 			try
@@ -269,7 +269,6 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 
 			try
 			{
-				// Find the user to be deleted by ID
 				var userToDelete = await _userManager.FindByIdAsync(id);
 
 				if (userToDelete == null)
@@ -297,7 +296,6 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 			}
 			catch (Exception ex)
 			{
-				// Handle any unexpected exceptions
 				return Json(new { status = false, message = "Đã xảy ra lỗi! Thử lại sau." });
 			}
 		}
