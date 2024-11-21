@@ -1,34 +1,53 @@
-﻿
+﻿function formatDateForInput(d) {
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1).toString().padStart(2, "0");
+    const day = d.getDate().toString().padStart(2, "0");
+    return `${year}-${month}-${day}`; // Format to yyyy-mm-dd
+}
+
 //load dữ liệu lên form sửa
-//function loadData(id) {
-//    $.ajax({
-//        type: 'POST',
-//        data: { "id": id },
-//        url: '/ClientUser/Index',
-//        success: function (response) {
-//            $("#matk").val(response.MaTK);
-//            $("#tendangnhap").val(response.TenDangNhap);
-//            $("#hoten").val(response.HoTen);
-//            if (response.TrangThai == true) {
-//                $("#actived").attr("checked", true);
-//            } else {
-//                $("#blocked").attr("checked", true);
-//            }
-//        },
-//        error: function (response) {
-//            //debugger;  
-//            console.log(xhr.responseText);
-//            alert("Error has occurred..");
-//        }
-//    });
-//}
+function loadData(id) {
+    $.ajax({
+        type: 'POST',
+        data: { "id": id },
+        url: '/Admin/ClientUser/Index',
+        success: function (response) {
+            console.log("Response from server: ", response);
+
+            const item = response.model;
+
+            $("#matk").val(item.id);
+            $("#email").val(item.email);
+            $("#fullName").val(item.fullName);
+            $("#phoneNumber").val(item.phoneNumber);
+            $("#address").val(item.address);
+            $("#date").val(formatDateForInput(new Date(item.date)));
+            $("#gender").val(item.gender);
+            $("#imagePreview").attr("src", item.existingImage);
+            $(`#${item.lockoutStatus ? 'blocked' : 'active'}`).prop("checked", true);
+        },
+        error: function (jqXHR) {
+            console.log("Error response:", jqXHR.responseText);
+            alert("An error occurred while loading data.");
+        }
+    });
+}
 
 //ajax sửa tài khoản
-function suaTaiKhoan(id) {
+function suaTaiKhoan() {
+    let data = {};
+    let formData = $('#update-form').serializeArray();
+
+    // Convert formData into key-value pairs
+    $.each(formData, function (index, value) {
+        data[value.name] = value.value;
+    });
+
     $.ajax({
-        url: '/ClientUser/Update',
-        type: 'post',
-        data: { Matk: id },
+        url: '/Admin/ClientUser/Update',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
         dataType: 'json',
         success: function (respone) {
             if (respone.status == true) {
@@ -71,7 +90,7 @@ function xoaTaiKhoan() {
     $.ajax({
         type: 'POST',
         data: { "id": id },
-        url: '/ClientUser/Delete',
+        url: '/Admin/ClientUser/Delete',
         success: function (response) {
             if (response.status == true) {
                 $(".cancelPopup").click();

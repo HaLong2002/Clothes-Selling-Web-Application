@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Shared;
 using System;
 using Website_ASP.NET_Core_MVC.Areas.Admin.Models;
 using Website_ASP.NET_Core_MVC.Data;
@@ -17,12 +19,14 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 		private readonly ApplicationDbContext _context;
 		private readonly UserManager<User> _userManager;
 		private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-		public ClientUserController(ApplicationDbContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+        public ClientUserController(ApplicationDbContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment webHostEnvironment)
 		{
 			_context = context;
 			_userManager = userManager;
 			_roleManager = roleManager;
+			_webHostEnvironment = webHostEnvironment;
 		}
 
 		[HttpGet]
@@ -76,27 +80,89 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 				return Json(new { status = false, message = "Không tìm thấy người dùng!" });
 			}
 
-			return Json(new { status = true, tk });
+			var model = new ClientUserViewModel
+			{
+				Id = id,
+				Email = tk.Email,
+				FullName = tk.FullName,
+				PhoneNumber = tk.PhoneNumber,
+				Address = tk.Address,
+				Date = tk.Date,
+				Gender = tk.Gender,
+				ExistingImage = tk.Image,
+				LockoutStatus = await IsAccountLocked(tk.Id)
+            };
+
+			return Json(new { status = true, model });
 		}
 
 		[HttpPost]
-		public async Task<JsonResult> Update(string Matk)
+		public async Task<JsonResult> Update(ClientUserViewModel model)
 		{
 			try
 			{
-				var tk = await _userManager.FindByIdAsync(Matk);
+				Console.WriteLine(model.Id);
+
+				var tk = await _userManager.FindByIdAsync(model.Id);
 
 				if (tk == null)
 				{
 					return Json(new { status = false, message = "Không tìm thấy người dùng!" });
 				}
 
-				//update.TrangThai = !update.TrangThai;
-				//_context.Entry(update).State = EntityState.Modified;
-				//_context.SaveChanges();
+                if (model.ImageFile != null)
+                {
+                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Images/CustomerAvatars");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
 
+                    // Delete old image if exists
+                    if (!string.IsNullOrEmpty(tk.Image))
+                    {
+                        var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, tk.Image.TrimStart('/'));
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
 
-				return Json(new { status = true, message = "Sửa thông tin thành công" });
+                    // Save new image
+                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImageFile.FileName;
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await model.ImageFile.CopyToAsync(fileStream);
+                    }
+
+                    tk.Image = "/Images/CustomerAvatars/" + uniqueFileName;
+                }
+
+                tk.Email = model.Email;
+				tk.FullName = model.FullName;
+				tk.Address = model.Address;
+				tk.Date = model.Date;
+				tk.Gender = model.Gender;
+
+                var phoneNumber = await _userManager.GetPhoneNumberAsync(tk);
+                if (model.PhoneNumber != phoneNumber)
+                {
+                    var setPhoneResult = await _userManager.SetPhoneNumberAsync(tk, model.PhoneNumber);
+                    if (!setPhoneResult.Succeeded)
+                    {
+                        return Json(new { status = false, message = "Có lỗi gì đó khi thiết lập số điện thoại !" });
+                    }
+                }
+
+                var result = await _userManager.UpdateAsync(tk);
+                if (!result.Succeeded)
+                {
+                    return Json(new { status = false, message = "Có lỗi gì đó khi cập nhật thông tin người dùng !" });
+                }                
+
+                return Json(new { status = true, message = "Sửa thông tin thành công" });
 			}
 			catch (Exception)
 			{
