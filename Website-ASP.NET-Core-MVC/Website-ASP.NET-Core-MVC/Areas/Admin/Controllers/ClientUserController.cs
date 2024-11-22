@@ -101,8 +101,6 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 		{
 			try
 			{
-				Console.WriteLine(model.Id);
-
 				var tk = await _userManager.FindByIdAsync(model.Id);
 
 				if (tk == null)
@@ -110,7 +108,13 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 					return Json(new { status = false, message = "Không tìm thấy người dùng!" });
 				}
 
-                if (model.ImageFile != null)
+				var emailExists = await _userManager.FindByEmailAsync(model.Email);
+				if (emailExists != null && emailExists.Id != model.Id)
+				{
+					return Json(new { status = false, message = "Email đã tồn tại. Vui lòng nhập email khác!" });
+				}
+
+				if (model.ImageFile != null)
                 {
                     var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Images/CustomerAvatars");
                     if (!Directory.Exists(uploadsFolder))

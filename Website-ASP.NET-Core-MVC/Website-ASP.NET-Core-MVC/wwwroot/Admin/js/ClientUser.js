@@ -24,6 +24,7 @@ function loadData(id) {
             $("#date").val(formatDateForInput(new Date(item.date)));
             $("#gender").val(item.gender);
             $("#imagePreview").attr("src", item.existingImage);
+            //$("#imageUpload").val(item.existingImage);
             $(`#${item.lockoutStatus ? 'blocked' : 'active'}`).prop("checked", true);
         },
         error: function (jqXHR) {
@@ -35,50 +36,44 @@ function loadData(id) {
 
 //ajax sửa tài khoản
 function suaTaiKhoan() {
-    let data = {};
-    let formData = $('#update-form').serializeArray();
-
-    // Convert formData into key-value pairs
-    $.each(formData, function (index, value) {
-        data[value.name] = value.value;
-    });
+    let form = $('#update-form')[0];
+    let formData = new FormData(form);
 
     $.ajax({
         url: '/Admin/ClientUser/Update',
         type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(data),
-        dataType: 'json',
-        success: function (respone) {
-            if (respone.status == true) {
+        data: formData,
+        contentType: false, // Important for file upload
+        processData: false, // Important for file upload
+        success: function (response) {
+            if (response.status) {
                 swal({
                     title: "Thành công!",
-                    text: respone.message,
-                    type: "success",
+                    text: response.message,
                     icon: "success",
                     timer: 1500,
                     button: false
                 });
                 setTimeout(function () {
                     window.location.replace("/Admin/ClientUser");
-                }, 1500)
+                }, 1500);
             } else {
                 swal({
                     title: "Thất bại!",
-                    text: respone.message,
-                    type: "danger",
+                    text: response.message,
                     icon: "error",
                     timer: 1500,
                     button: false
                 });
             }
         },
-        error: function (respone) {
-            console.log(respone);
+        error: function (response) {
+            console.error(response);
         }
     });
     return false;
 }
+
 
 //load data lên form xóa
 function deleteData(id) {

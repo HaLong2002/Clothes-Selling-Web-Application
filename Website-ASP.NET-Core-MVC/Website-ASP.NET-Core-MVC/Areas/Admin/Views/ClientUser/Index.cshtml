@@ -54,7 +54,7 @@
 					<td><span class="font-weight-normal">@item.Address</span></td>
 					<td>
 						<span class="font-weight-normal">
-							@(item.Date.HasValue ? item.Date.Value.ToString("dd/MM/yyyy") : "N/A")
+							@(item.Date.HasValue ? item.Date.Value.ToString("dd/MM/yyyy") : "")
 						</span>
 					</td>
 					<td><span class="font-weight-normal">@item.Gender</span></td>
@@ -68,11 +68,18 @@
 								<span class="sr-only">Danh mục lựa chọn</span>
 							</button>
 							<div class="dropdown-menu">
-								<button class="dropdown-item change" onclick="loadData('@item.Id')">
+								@* <button class="dropdown-item change" onclick="loadData('@item.Id')">
 									<span class="fas fa-edit mr-2"></span>
 									@* @(item.LockoutStatus ? "Không khóa" : "Khóa") *@
+									@*Chỉnh sửa
+								</button> *@
+								<button class="dropdown-item"
+										title="Quản lý tài khoản khách hàng"
+										onclick="location.href='@Url.Page("/Account/Manage/Index", new { area = "Identity", id = item.Id })'">
+									<span class="fas fa-edit mr-2"></span>
 									Chỉnh sửa
 								</button>
+
 								<button class="dropdown-item text-danger delete" onclick="deleteData(@item.Id)"><span class="fas fa-trash-alt mr-2"></span>Xóa</button>
 							</div>
 						</div>
@@ -109,7 +116,15 @@
 								<div class="form-group mb-2">
 									<label for="adminAccount">Email</label>
 									<div class="input-group">
-										<input type="text" name="Email" class="form-control" placeholder="Email" value="" autofocus required>
+										<input type="text"
+											   name="Email"
+											   class="form-control"
+											   placeholder="Email"
+											   value=""
+											   autofocus
+											   required
+											   pattern="[a-z0-9._%+-]+@@[a-z0-9.-]+\.[a-z]{2,}$"
+											   title="Email không hợp lệ">
 									</div>
 								</div>
 								<div class="form-group mb-2">
@@ -182,7 +197,16 @@
 								<div class="form-group mb-4">
 									<label for="adminAccount">Email</label>
 									<div class="input-group">
-										<input type="text" name="Email" class="form-control" placeholder="Email" id="email" value="" autofocus required>
+										@* <input type="text"
+											   name="Email"
+											   class="form-control"
+											   placeholder="Email"
+											   value=""
+											   autofocus
+											   required
+											   pattern="[a-z0-9._%+-]+@@[a-z0-9.-]+\.[a-z]{2,}$"
+											   title="Email không hợp lệ"> *@
+										<input type="text" name="Email" class="form-control" placeholder="Email" value="" id="email" readonly>
 									</div>
 								</div>
 								<div class="form-group mb-4">
@@ -194,8 +218,17 @@
 								<div class="form-group mb-4">
 									<label for="phoneNumber">Số điện thoại</label>
 									<div class="input-group">
-										<input type="number" name="PhoneNumber" class="form-control" placeholder="Số điện thoại" value="" id="phoneNumber">
+										<input type="text"
+											   name="PhoneNumber"
+											   class="form-control"
+											   placeholder="Số điện thoại"
+											   value=""
+											   id="phoneNumber"
+											   required
+											   pattern="\d{10}"
+											   title="Số điện thoại phải chứa đúng 10 chữ số.">
 									</div>
+
 								</div>
 								<div class="form-group mb-4">
 									<label for="fullName">Địa chỉ</label>
@@ -228,7 +261,7 @@
 										<label for="blocked" class="text-danger" style="display: contents">Khóa</label>
 									</div>
 								</div>
-								<button type="submit" class="btn btn-block btn-secondary">Chỉnh sửa tài khoản</button>
+								<button type="submit" class="btn btn-block btn-secondary">Lưu</button>
 								<div class="btn btn-block border-primary cancelPopup" id="cancelPopup">Hủy</div>
 							</form>
 						</div>
