@@ -2,31 +2,37 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Shared;
 using System;
+using System.Text.Encodings.Web;
+using System.Text;
 using Website_ASP.NET_Core_MVC.Areas.Admin.Models;
 using Website_ASP.NET_Core_MVC.Data;
 using Website_ASP.NET_Core_MVC.Models;
 using X.PagedList.Extensions;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 {
 	[Area("Admin")]
 	[Authorize(Roles = "Admin,SuperAdmin")]
-    public class ClientUserController : Controller
+	public class ClientUserController : Controller
 	{
 		private readonly ApplicationDbContext _context;
 		private readonly UserManager<User> _userManager;
 		private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IWebHostEnvironment _webHostEnvironment;
+		private readonly IWebHostEnvironment _webHostEnvironment;
+		private readonly IEmailSender _emailSender;
 
-        public ClientUserController(ApplicationDbContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment webHostEnvironment)
+		public ClientUserController(ApplicationDbContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment webHostEnvironment, IEmailSender emailSender)
 		{
 			_context = context;
 			_userManager = userManager;
 			_roleManager = roleManager;
 			_webHostEnvironment = webHostEnvironment;
+			_emailSender = emailSender;
 		}
 
 		[HttpGet]
@@ -41,36 +47,36 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 				taikhoans = taikhoans.Where(tk => tk.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
 			}
 
-            var taikhoansWithLockoutStatus = new List<ClientUserViewModel>();
+			var taikhoansWithLockoutStatus = new List<ClientUserViewModel>();
 
-            foreach (var user in taikhoans)
-            {
-                taikhoansWithLockoutStatus.Add(new ClientUserViewModel
-                {
-                    Id = user.Id,
-                    FullName = user.FullName,
-                    Email = user.Email,
-                    PhoneNumber = user.PhoneNumber,
-                    Address = user.Address,
-                    Date = user.Date,
-                    Gender = user.Gender,
-                    LockoutStatus = await IsAccountLocked(user.Id)
-                });
-            }
+			foreach (var user in taikhoans)
+			{
+				taikhoansWithLockoutStatus.Add(new ClientUserViewModel
+				{
+					Id = user.Id,
+					FullName = user.FullName,
+					Email = user.Email,
+					PhoneNumber = user.PhoneNumber,
+					Address = user.Address,
+					Date = user.Date,
+					Gender = user.Gender,
+					LockoutStatus = await IsAccountLocked(user.Id)
+				});
+			}
 
-            return View(taikhoansWithLockoutStatus.OrderBy(tk => tk.Id).ToPagedList(page, pageSize));
+			return View(taikhoansWithLockoutStatus.OrderBy(tk => tk.Id).ToPagedList(page, pageSize));
 		}
 
-        private async Task<bool> IsAccountLocked(string userId)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
+		private async Task<bool> IsAccountLocked(string userId)
+		{
+			var user = await _userManager.FindByIdAsync(userId);
 
-            if (user == null) return false;
+			if (user == null) return false;
 
-            return user.LockoutEnabled && user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow;
-        }
+			return user.LockoutEnabled && user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow;
+		}
 
-        [HttpPost]
+		[HttpPost]
 		public async Task<JsonResult> Index(string id)
 		{
 			var tk = await _userManager.FindByIdAsync(id);
@@ -91,7 +97,7 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 				Gender = tk.Gender,
 				ExistingImage = tk.Image,
 				LockoutStatus = await IsAccountLocked(tk.Id)
-            };
+			};
 
 			return Json(new { status = true, model });
 		}
@@ -108,71 +114,119 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 					return Json(new { status = false, message = "Không tìm thấy người dùng!" });
 				}
 
-				var emailExists = await _userManager.FindByEmailAsync(model.Email);
-				if (emailExists != null && emailExists.Id != model.Id)
+				if (model.Email != tk.Email)
 				{
-					return Json(new { status = false, message = "Email đã tồn tại. Vui lòng nhập email khác!" });
+					return Json(new { status = false, message = "Vui lòng nhấn 'Đổi email' để thực hiện thay đổi email !" });
 				}
 
 				if (model.ImageFile != null)
-                {
-                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Images/CustomerAvatars");
-                    if (!Directory.Exists(uploadsFolder))
-                    {
-                        Directory.CreateDirectory(uploadsFolder);
-                    }
+				{
+					var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Images/CustomerAvatars");
+					if (!Directory.Exists(uploadsFolder))
+					{
+						Directory.CreateDirectory(uploadsFolder);
+					}
 
-                    // Delete old image if exists
-                    if (!string.IsNullOrEmpty(tk.Image))
-                    {
-                        var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, tk.Image.TrimStart('/'));
-                        if (System.IO.File.Exists(oldImagePath))
-                        {
-                            System.IO.File.Delete(oldImagePath);
-                        }
-                    }
+					// Delete old image if exists
+					if (!string.IsNullOrEmpty(tk.Image))
+					{
+						var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, tk.Image.TrimStart('/'));
+						if (System.IO.File.Exists(oldImagePath))
+						{
+							System.IO.File.Delete(oldImagePath);
+						}
+					}
 
-                    // Save new image
-                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImageFile.FileName;
-                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+					// Save new image
+					var uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImageFile.FileName;
+					var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await model.ImageFile.CopyToAsync(fileStream);
-                    }
+					using (var fileStream = new FileStream(filePath, FileMode.Create))
+					{
+						await model.ImageFile.CopyToAsync(fileStream);
+					}
 
-                    tk.Image = "/Images/CustomerAvatars/" + uniqueFileName;
-                }
+					tk.Image = "/Images/CustomerAvatars/" + uniqueFileName;
+				}
 
-                tk.Email = model.Email;
 				tk.FullName = model.FullName;
 				tk.Address = model.Address;
 				tk.Date = model.Date;
 				tk.Gender = model.Gender;
 
-                var phoneNumber = await _userManager.GetPhoneNumberAsync(tk);
-                if (model.PhoneNumber != phoneNumber)
-                {
-                    var setPhoneResult = await _userManager.SetPhoneNumberAsync(tk, model.PhoneNumber);
-                    if (!setPhoneResult.Succeeded)
-                    {
-                        return Json(new { status = false, message = "Có lỗi gì đó khi thiết lập số điện thoại !" });
-                    }
-                }
+				var phoneNumber = await _userManager.GetPhoneNumberAsync(tk);
+				if (model.PhoneNumber != phoneNumber)
+				{
+					var setPhoneResult = await _userManager.SetPhoneNumberAsync(tk, model.PhoneNumber);
+					if (!setPhoneResult.Succeeded)
+					{
+						return Json(new { status = false, message = "Có lỗi gì đó khi thiết lập số điện thoại !" });
+					}
+				}
 
-                var result = await _userManager.UpdateAsync(tk);
-                if (!result.Succeeded)
-                {
-                    return Json(new { status = false, message = "Có lỗi gì đó khi cập nhật thông tin người dùng !" });
-                }                
+				if (model.LockoutStatus)
+				{
+					await _userManager.SetLockoutEndDateAsync(tk, DateTime.UtcNow.AddYears(100)); // Locked indefinitely
+				}
+				else
+				{
+					await _userManager.SetLockoutEndDateAsync(tk, null);   // Unlock
+				}
 
-                return Json(new { status = true, message = "Sửa thông tin thành công" });
+				var result = await _userManager.UpdateAsync(tk);
+				if (!result.Succeeded)
+				{
+					return Json(new { status = false, message = "Có lỗi gì đó khi cập nhật thông tin người dùng !" });
+				}
+
+				return Json(new { status = true, message = "Sửa thông tin thành công" });
 			}
 			catch (Exception)
 			{
 				return Json(new { status = false, message = "Có lỗi gì đó. Thử lại sau !" });
 			}
 		}
+
+		[HttpGet]
+		public async Task<JsonResult> ChangeEmail(string id, string email)
+		{
+			if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(email))
+			{
+				return Json(new { status = false, message = "Đường link không hợp lệ !" });
+			}
+
+			var client = await _userManager.FindByIdAsync(id);
+			if (client == null)
+			{
+				return Json(new { status = false, message = "Không tìm thấy người dùng !" });
+			}
+
+			if (email == client.Email)
+			{
+				return Json(new { status = false, message = "Vui lòng nhập email khác để thay đổi!" });
+			}
+
+			var emailExists = await _userManager.FindByEmailAsync(email);
+			if (emailExists != null && emailExists.Id != id)
+			{
+				return Json(new { status = false, message = "Email đã tồn tại. Vui lòng nhập email khác!" });
+			}
+
+			var code = await _userManager.GenerateChangeEmailTokenAsync(client, email);
+			code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+			var callbackUrl = Url.Page(
+				"/Account/ConfirmEmailChange",
+				pageHandler: null,
+				values: new { area = "Identity", userId = id, email = email, code = code },
+				protocol: Request.Scheme);
+
+			// Send the email
+			var emailContent = $"Please confirm your email change by clicking <a href='{callbackUrl}'>here</a>.";
+			await _emailSender.SendEmailAsync(email, "Confirm Email Change", emailContent);
+
+			return Json(new { status = true, message = "Email xác nhận đã được gửi. Hãy kiểm tra hộp thư của bạn !" });
+		}
+
 
 		[HttpPost]
 		public async Task<JsonResult> Delete(string id)

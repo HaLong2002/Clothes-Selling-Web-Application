@@ -21,7 +21,10 @@ function loadData(id) {
             $("#fullName").val(item.fullName);
             $("#phoneNumber").val(item.phoneNumber);
             $("#address").val(item.address);
-            $("#date").val(formatDateForInput(new Date(item.date)));
+            if (item.date != null)
+                $("#date").val(formatDateForInput(new Date(item.date)));
+            else
+                $("#date").val(new Date(item.date));
             $("#gender").val(item.gender);
             $("#imagePreview").attr("src", item.existingImage);
             //$("#imageUpload").val(item.existingImage);
@@ -38,6 +41,9 @@ function loadData(id) {
 function suaTaiKhoan() {
     let form = $('#update-form')[0];
     let formData = new FormData(form);
+
+    const lockoutStatus = $("input[name='LockoutStatus']:checked").val() === 'true';  // Convert to boolean (true or false)
+    formData.append('LockoutStatus', lockoutStatus);
 
     $.ajax({
         url: '/Admin/ClientUser/Update',
@@ -62,9 +68,9 @@ function suaTaiKhoan() {
                     title: "Thất bại!",
                     text: response.message,
                     icon: "error",
-                    timer: 1500,
-                    button: false
+                    button: "OK"
                 });
+                //$("#add-message").html(response.message).addClass("text-danger").removeClass("text-success");
             }
         },
         error: function (response) {
@@ -74,6 +80,59 @@ function suaTaiKhoan() {
     return false;
 }
 
+function doiEmail() {
+    const userId = document.getElementById("matk").value;
+    const emailInput = document.getElementById("email"); // Get the input element
+    const email = emailInput.value; // Get the input value
+    const emailPattern = /^[a-z0-9._%+-]+@gmail\.com$/i;
+
+    if (!emailPattern.test(email)) {
+        //alert("Email không hợp lệ!");
+        swal({
+            title: "Thất bại!",
+            text: "Email không hợp lệ!",
+            icon: "error",
+            button: "OK",
+        });
+        emailInput.focus(); // Focus on the input element
+        return;
+    }
+
+    $.ajax({
+        url: '/Admin/ClientUser/ChangeEmail',
+        type: 'GET',
+        data: { id: userId, email: email }, // Send `id` and `email` as query parameters
+        success: function (response) {
+            if (response.status) {
+                swal({
+                    title: "Thành công!",
+                    text: response.message,
+                    icon: "success",
+                    button: "OK",
+                }).then(function () {
+                    window.location.replace("/Admin/ClientUser");
+                });
+            }
+            else {
+                swal({
+                    title: "Thất bại!",
+                    text: response.message,
+                    icon: "error",
+                    button: "OK",
+                })
+            }
+        },
+        error: function (response) {
+            swal({
+                title: "Lỗi!",
+                text: "Có lỗi khi gửi yêu cầu. Vui lòng thử lại.",
+                icon: "error",
+                button: "OK",
+            });
+            console.error(response);
+        }
+    });
+}
 
 //load data lên form xóa
 function deleteData(id) {

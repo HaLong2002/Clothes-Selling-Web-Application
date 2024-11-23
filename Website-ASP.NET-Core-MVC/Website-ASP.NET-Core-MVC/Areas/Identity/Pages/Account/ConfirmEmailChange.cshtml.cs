@@ -58,7 +58,10 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
                 return Page();
             }
 
-            await _signInManager.RefreshSignInAsync(user);
+            var userCurrent = await _userManager.GetUserAsync(User);
+            if (userCurrent.Id == userId)
+                await _signInManager.RefreshSignInAsync(user);
+
             StatusMessage = "Cảm ơn bạn đã xác nhận thay đổi email.";
             return Page();
         }

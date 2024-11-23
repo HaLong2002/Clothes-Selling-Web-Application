@@ -12,5 +12,6 @@
         public IFormFile? ImageFile { get; set; }
         public string? ExistingImage { get; set; }
         public bool LockoutStatus { get; set; }
+
     }
 }

@@ -68,18 +68,17 @@
 								<span class="sr-only">Danh mục lựa chọn</span>
 							</button>
 							<div class="dropdown-menu">
-								@* <button class="dropdown-item change" onclick="loadData('@item.Id')">
-									<span class="fas fa-edit mr-2"></span>
-									@* @(item.LockoutStatus ? "Không khóa" : "Khóa") *@
-									@*Chỉnh sửa
-								</button> *@
-								<button class="dropdown-item"
+								<button class="dropdown-item change" onclick="loadData('@item.Id')">
+							<span class="fas fa-edit mr-2"></span>
+							@* @(item.LockoutStatus ? "Không khóa" : "Khóa") *@
+								Chỉnh sửa
+							</button>
+								@* <button class="dropdown-item"
 										title="Quản lý tài khoản khách hàng"
 										onclick="location.href='@Url.Page("/Account/Manage/Index", new { area = "Identity", id = item.Id })'">
 									<span class="fas fa-edit mr-2"></span>
 									Chỉnh sửa
-								</button>
-
+								</button> *@
 								<button class="dropdown-item text-danger delete" onclick="deleteData(@item.Id)"><span class="fas fa-trash-alt mr-2"></span>Xóa</button>
 							</div>
 						</div>
@@ -197,16 +196,16 @@
 								<div class="form-group mb-4">
 									<label for="adminAccount">Email</label>
 									<div class="input-group">
-										@* <input type="text"
+										<input type="text"
 											   name="Email"
 											   class="form-control"
 											   placeholder="Email"
 											   value=""
 											   autofocus
 											   required
-											   pattern="[a-z0-9._%+-]+@@[a-z0-9.-]+\.[a-z]{2,}$"
-											   title="Email không hợp lệ"> *@
-										<input type="text" name="Email" class="form-control" placeholder="Email" value="" id="email" readonly>
+											   id="email">
+										@* <input type="text" name="Email" class="form-control" placeholder="Email" value="" id="email" readonly> *@
+<button type="button" class="btn btn-outline-primary" onclick="doiEmail()">Đổi email</button>
 									</div>
 								</div>
 								<div class="form-group mb-4">
@@ -224,7 +223,6 @@
 											   placeholder="Số điện thoại"
 											   value=""
 											   id="phoneNumber"
-											   required
 											   pattern="\d{10}"
 											   title="Số điện thoại phải chứa đúng 10 chữ số.">
 									</div>
@@ -254,10 +252,10 @@
 								<div class="form-group mb-4">
 									<label for="lockoutStatus">Khóa tài khoản</label>
 									<div class="input-group" style="display: flex; align-items: center" id="optionsAccount">
-										<input type="radio" name="LockoutStatus" value="Không khóa" id="active" style="margin-right: 10px" />
+										<input type="radio" name="LockoutStatus" value="false" id="active" style="margin-right: 10px" />
 										<label for="actived" class="text-success" style="display: contents;">Không khóa</label>
 
-										<input type="radio" name="LockoutStatus" value="Khóa" id="blocked" style="margin: 0 10px 0 20px" />
+										<input type="radio" name="LockoutStatus" value="true" id="blocked" style="margin: 0 10px 0 20px" />
 										<label for="blocked" class="text-danger" style="display: contents">Khóa</label>
 									</div>
 								</div>
