@@ -26,8 +26,10 @@ function loadData(id) {
             else
                 $("#date").val(new Date(item.date));
             $("#gender").val(item.gender);
-            $("#imagePreview").attr("src", item.existingImage);
-            //$("#imageUpload").val(item.existingImage);
+            if (item.existingImage != null)
+                $("#imagePreview").attr("src", item.existingImage);
+            else
+                $("#imagePreview").attr("src", "/Images/CustomerAvatars/default-avatar.png");
             $(`#${item.lockoutStatus ? 'blocked' : 'active'}`).prop("checked", true);
         },
         error: function (jqXHR) {
@@ -35,6 +37,58 @@ function loadData(id) {
             alert("An error occurred while loading data.");
         }
     });
+}
+
+//Ajax thêm tài khoản
+function themTaiKhoan() {
+    let data = {};
+    let formData = $('#add-form').serializeArray();
+    formData.forEach(field => data[field.name] = field.value);
+
+
+    const emailInput = document.getElementById("themEmail"); // Get the input element
+    const email = emailInput.value; // Get the input value
+    const emailPattern = /^[a-z0-9._%+-]+@gmail\.com$/i;
+
+    if (!emailPattern.test(email)) {
+        $("#add-message").html("Email không hợp lệ !").addClass("text-danger");
+        return false;
+    }
+    
+    if (data["Password"] != data["ConfirmPassword"]) {
+        $("#add-message").html("Mật khẩu không khớp !").addClass("text-danger");
+        return false;
+    }
+
+    console.log("Data da nhap:", data);
+
+    // Rest of the code remains the same
+    $.ajax({
+        url: '/Admin/ClientUser/Create',
+        type: 'post',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        dataType: 'json',
+        success: function (response) {
+            if (response.status) {
+                swal({
+                    title: "Thêm thành công!",
+                    text: response.message,
+                    icon: "success",
+                    button: "OK",
+                }).then(function () {
+                    window.location.replace("/Admin/ClientUser");
+                });
+            } else {
+                $("#add-message").html(response.message).addClass("text-danger").removeClass("text-success");
+            }
+        },
+        error: function (jqXHR) {
+            console.log("Error response:", jqXHR.responseText);
+            $("#add-message").html("Có lỗi xảy ra. Vui lòng thử lại.").addClass("text-danger");
+        }
+    });
+    return false;
 }
 
 //ajax sửa tài khoản
@@ -70,7 +124,7 @@ function suaTaiKhoan() {
                     icon: "error",
                     button: "OK"
                 });
-                //$("#add-message").html(response.message).addClass("text-danger").removeClass("text-success");
+                //$("#update-message").html(response.message).addClass("text-danger").removeClass("text-success");
             }
         },
         error: function (response) {

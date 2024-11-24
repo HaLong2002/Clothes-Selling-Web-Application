@@ -69,16 +69,9 @@
 							</button>
 							<div class="dropdown-menu">
 								<button class="dropdown-item change" onclick="loadData('@item.Id')">
-							<span class="fas fa-edit mr-2"></span>
-							@* @(item.LockoutStatus ? "Không khóa" : "Khóa") *@
-								Chỉnh sửa
-							</button>
-								@* <button class="dropdown-item"
-										title="Quản lý tài khoản khách hàng"
-										onclick="location.href='@Url.Page("/Account/Manage/Index", new { area = "Identity", id = item.Id })'">
 									<span class="fas fa-edit mr-2"></span>
 									Chỉnh sửa
-								</button> *@
+								</button>
 								<button class="dropdown-item text-danger delete" onclick="deleteData(@item.Id)"><span class="fas fa-trash-alt mr-2"></span>Xóa</button>
 							</div>
 						</div>
@@ -107,9 +100,9 @@
 					<div class="col-12 d-flex align-items-center justify-content-center">
 						<div class="signin-inner my-3 my-lg-0 bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
 							<div class="text-center text-md-center mb-4 mt-md-0">
-								<h1 class="mb-0 h3 text-popup">Tạo tài khoản quản trị</h1>
+								<h1 class="mb-0 h3 text-popup">Tạo tài khoản khách hàng</h1>
 							</div>
-							<form id="add-form" onsubmit="return themTaiKhoanAdmin()" method="post">
+							<form id="add-form" onsubmit="return themTaiKhoan()" method="post">
 								<p id="add-message"></p>
 								<hr />
 								<div class="form-group mb-2">
@@ -122,8 +115,7 @@
 											   value=""
 											   autofocus
 											   required
-											   pattern="[a-z0-9._%+-]+@@[a-z0-9.-]+\.[a-z]{2,}$"
-											   title="Email không hợp lệ">
+											   id="themEmail">
 									</div>
 								</div>
 								<div class="form-group mb-2">
@@ -132,11 +124,39 @@
 										<input type="text" name="FullName" class="form-control" placeholder="Họ và tên" value="" required>
 									</div>
 								</div>
-								<div class="form-group mb-2">
-									<label>Loại tài khoản</label>
-									<div id="add-roles">
-										<!-- Roles checkboxes will be dynamically generated here -->
+								<div class="form-group mb-4">
+									<label for="phoneNumber">Số điện thoại</label>
+									<div class="input-group">
+										<input type="text"
+											   name="PhoneNumber"
+											   class="form-control"
+											   placeholder="Số điện thoại"
+											   value=""
+											   pattern="\d{10}"
+											   title="Số điện thoại phải chứa đúng 10 chữ số.">
 									</div>
+
+								</div>
+								<div class="form-group mb-4">
+									<label for="fullName">Địa chỉ</label>
+									<div class="input-group">
+										<input type="text" name="Address" class="form-control" placeholder="Địa chỉ" value="">
+									</div>
+								</div>
+								<div class="form-group mb-4">
+									<label for="date">Ngày Sinh</label>
+									<div class="input-group">
+										<input type="date" name="Date" class="form-control" placeholder="Ngày sinh" value="">
+									</div>
+								</div>
+								<div class="form-group mb-4">
+									<label for="gender">Giới tính</label>
+									<select name="Gender" class="form-control" placeholder="Giới tính">
+										<option value="">-- Giới tính --</option>
+										<option value="Nam">Nam</option>
+										<option value="Nu">Nữ</option>
+										<option value="Khac">Khác</option>
+									</select>
 								</div>
 								<div class="form-group mb-2">
 									<label for="password">Mật khẩu</label>
@@ -204,8 +224,7 @@
 											   autofocus
 											   required
 											   id="email">
-										@* <input type="text" name="Email" class="form-control" placeholder="Email" value="" id="email" readonly> *@
-<button type="button" class="btn btn-outline-primary" onclick="doiEmail()">Đổi email</button>
+										<button type="button" class="btn btn-outline-primary" onclick="doiEmail()">Đổi email</button>
 									</div>
 								</div>
 								<div class="form-group mb-4">

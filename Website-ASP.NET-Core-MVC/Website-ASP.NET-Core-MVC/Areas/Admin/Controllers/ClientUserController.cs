@@ -77,6 +77,65 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 		}
 
 		[HttpPost]
+		public async Task<JsonResult> Create([FromBody] CreateAccountClient model)
+		{
+			if(model == null)
+				return Json(new
+				{
+					status = false,
+					message = "Model null."
+				});
+
+			var existingUser = await _userManager.FindByEmailAsync(model.Email);
+			if (existingUser != null)
+			{
+				return Json(new
+				{
+					status = false,
+					message = "Email đã được sử dụng. Vui lòng chọn email khác."
+				});
+			}
+
+			var client = new User
+			{
+				UserName = model.Email,
+				Email = model.Email,
+				FullName = model.FullName,
+				PhoneNumber = model.PhoneNumber,
+				Address = model.Address,
+				Date = model.Date,
+				Gender = model.Gender,
+				Image = "/Images/CustomerAvatars/default-avatar.png"
+			};
+
+			var result = await _userManager.CreateAsync(client, model.Password);
+
+			if (result.Succeeded)
+			{
+				await _userManager.AddToRoleAsync(client, Enums.Roles.Customer.ToString());
+
+				// Gửi email xác nhận
+				var userId = await _userManager.GetUserIdAsync(client);
+				var code = await _userManager.GenerateEmailConfirmationTokenAsync(client);
+				code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+				var callbackUrl = Url.Page(
+					"/Account/ConfirmEmail",
+					pageHandler: null,
+					values: new { area = "Identity", userId = userId, code = code},
+					protocol: Request.Scheme);
+
+				await _emailSender.SendEmailAsync(client.Email, "Xác nhận Email của bạn",
+					$"Vui lòng xác nhận tài khoản tại đây <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+				return Json(new { status = true, message = "Email xác nhận đã được gửi. Hãy kiểm tra hộp thư của bạn !" });
+				//return Json(new { status = true, message = "Thêm tài khoản thành công!" });
+			}
+
+			var addErrors = string.Join("; ", result.Errors.Select(e => e.Description));
+			return Json(new { status = false, message = $"{addErrors}" });
+		}
+
+		[HttpPost]
 		public async Task<JsonResult> Index(string id)
 		{
 			var tk = await _userManager.FindByIdAsync(id);
@@ -226,7 +285,6 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 
 			return Json(new { status = true, message = "Email xác nhận đã được gửi. Hãy kiểm tra hộp thư của bạn !" });
 		}
-
 
 		[HttpPost]
 		public async Task<JsonResult> Delete(string id)
