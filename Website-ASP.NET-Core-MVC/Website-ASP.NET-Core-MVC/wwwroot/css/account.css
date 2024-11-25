@@ -36,7 +36,7 @@
     position: relative;
     height: 52px;
     width: 100%;
-    background-color: #10a37f;
+    background-color: #eb5836;
     color: #fff;
     margin: 24px 0 0;
     border-radius: 6px;
@@ -48,20 +48,20 @@
 }
 
 .custom-btn-color {
-    background-color: #10a37f;
-    border-color: #10a37f;
+    background-color: #eb5836;
+    border-color: #eb5836;
 }
 
 /* Change the background and font color of the active navigation link */
 .nav-item .nav-link.active {
-    background-color: #10a37f;
+    background-color: #eb5836;
     color: white;
 }
 
 /* Change the background and font color of the inactive navigation links */
 .nav-item .nav-link:not(.active) {
     background-color: white;
-    color: #10a37f;
+    color: #eb5836;
 }
 
 /* Change the background and font color of the navigation links on hover */

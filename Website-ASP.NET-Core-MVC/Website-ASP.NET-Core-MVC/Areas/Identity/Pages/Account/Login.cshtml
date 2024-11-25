@@ -24,12 +24,14 @@
 			<div class="float-end mb-3">
 				<a id="forgot-password" asp-page="./ForgotPassword" class="text-decoration-none">Quên mật khẩu?</a>
 			</div>
-			<div class="checkbox mb-3">
-				<label asp-for="Input.RememberMe" class="form-label">
+			@* <div class="checkbox mb-3">
+				<div class="form-check">
 					<input class="form-check-input" asp-for="Input.RememberMe" />
-					@Html.DisplayNameFor(m => m.Input.RememberMe)
-				</label>
-			</div>
+					<label asp-for="Input.RememberMe" class="form-label">
+						@Html.DisplayNameFor(m => m.Input.RememberMe)
+					</label>
+				</div>
+			</div> *@
 			<div>
 				<button id="login-submit" type="submit" class="account-button">Đăng nhập</button>
 			</div>

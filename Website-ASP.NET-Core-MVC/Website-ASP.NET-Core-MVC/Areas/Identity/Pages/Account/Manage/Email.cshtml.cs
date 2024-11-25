@@ -93,13 +93,16 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account.Manage
             if (Input.NewEmail != email)
             {
                 var userId = await _userManager.GetUserIdAsync(user);
+
                 var code = await _userManager.GenerateChangeEmailTokenAsync(user, Input.NewEmail);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
                 var callbackUrl = Url.Page(
                     "/Account/ConfirmEmailChange",
                     pageHandler: null,
-                    values: new { area = "Identity", userId = userId, email = Input.NewEmail, code = code },
+                    values: new { area = "Identity", userId = userId, email = Input.NewEmail, code = code, returnUrl = Request.Path + Request.QueryString },
                     protocol: Request.Scheme);
+
                 await _emailSender.SendEmailAsync(
                     Input.NewEmail,
                     "Xác nhận email của bạn",
@@ -114,39 +117,5 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account.Manage
             StatusMessage = "Email của bạn không thay đổi.";
             return RedirectToPage();
         }
-
-        /*
-        public async Task<IActionResult> OnPostSendVerificationEmailAsync()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return NotFound($"Không thể tải người dùng với ID '{_userManager.GetUserId(User)}'.");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                await LoadAsync(user);
-                return Page();
-            }
-
-            var userId = await _userManager.GetUserIdAsync(user);
-            var email = await _userManager.GetEmailAsync(user);
-            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-            var callbackUrl = Url.Page(
-                "/Account/ConfirmEmail",
-                pageHandler: null,
-                values: new { area = "Identity", userId = userId, code = code },
-                protocol: Request.Scheme);
-            await _emailSender.SendEmailAsync(
-                email,
-                "Xác nhận email của bạn",
-                $"Vui lòng Xác nhận tài khoản của bạn tại đây <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-            StatusMessage = "Đã gửi email xác nhận. Vui lòng kiểm tra email của bạn.";
-            return RedirectToPage();
-        }
-        */
     }
 }

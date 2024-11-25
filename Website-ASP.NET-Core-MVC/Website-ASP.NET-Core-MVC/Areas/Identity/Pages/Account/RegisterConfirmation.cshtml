@@ -4,7 +4,7 @@
 	ViewData["Title"] = "Xác nhận đăng ký";
 }
 
-<h2 class="text-center">@ViewData["Title"]</h2>
+<h2 class="text-center mb-3">@ViewData["Title"]</h2>
 @{
 	//     if (@Model.DisplayConfirmAccountLink)
 	//     {
@@ -15,8 +15,8 @@
 	//     }
 	//     else
 	//     {
-	<p class="text-center">Vui lòng kiểm tra email để xác nhận tài khoản của bạn.</p>
-	<p class="text-center">Nếu bạn không thấy email, hãy kiểm tra thư mục thư rác hoặc <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Gửi lại email xác nhận</a>.</p>
+	<p class="text-center mb-3" style="font-size: 18px;">Vui lòng kiểm tra email để xác nhận tài khoản của bạn.</p>
+	<p class="text-center" style="font-size: 18px;">Nếu bạn không thấy email, hãy kiểm tra thư mục thư rác hoặc <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Gửi lại email xác nhận</a>.</p>
 
 	// }
 }

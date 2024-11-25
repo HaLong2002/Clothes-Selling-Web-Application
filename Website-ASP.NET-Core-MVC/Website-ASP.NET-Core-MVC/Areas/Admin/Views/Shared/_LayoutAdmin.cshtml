@@ -3,7 +3,6 @@
 @inject UserManager<User> UserManager
 
 @{
-    //Nhom9.Models.TaiKhoanQuanTri tk = (Nhom9.Models.TaiKhoanQuanTri)HttpContext.Current.Session[Nhom9.Session.ConstaintUser.ADMIN_SESSION];
     var currentUser = await UserManager.GetUserAsync(User);
 }
 
@@ -65,9 +64,6 @@
                                 <div class="d-block">
                                     <h2 class="h6">Hi, @currentUser.FullName</h2>
                                     @* <a href="@Url.Action("Logout","Login")" class="btn btn-secondary text-dark btn-xs"><span class="mr-2"><span class="fas fa-sign-out-alt"></span></span>Đăng xuất</a> *@
-                                    <form class="d-inline-block" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "Admin" })" method="post" id="logoutForm">
-                                        <button type="submit" class="nav-link btn btn-link text-dark" style="padding: 0.5rem 1rem;">Đăng xuất</button>
-                                    </form>
                                 </div>
                             </div>
                             <div class="collapse-close d-md-none">
@@ -141,8 +137,19 @@
                                         <div class="dropdown-menu dashboard-dropdown dropdown-menu-right mt-2">
                                             @*<a class="dropdown-item font-weight-bold" href="#"><span class="far fa-user-circle"></span>Thông tin cá nhân</a>
                                             <a class="dropdown-item font-weight-bold" href="#"><span class="fas fa-cog"></span>Cài đặt</a>*@
-                                            <div role="separator" class="dropdown-divider"></div>
-                                            <a class="dropdown-item font-weight-bold" href="@Url.Action("Logout","Login")"><span class="fas fa-sign-out-alt text-danger"></span>Đăng xuất</a>
+                                            @* <div role="separator" class="dropdown-divider"></div> *@
+                                            @* <a class="dropdown-item font-weight-bold" href="@Url.Action("Logout","Login")"><span class="fas fa-sign-out-alt text-danger"></span>Đăng xuất</a> *@
+                                            @* <form class="dropdown-item font-weight-bold d-inline-block" action="/Identity/Account/Logout" method="post" id="logoutForm">
+                                                <button type="submit" class="nav-link btn btn-link text-dark">
+                                                    <span class="fas fa-sign-out-alt text-danger"></span>
+                                                    Đăng xuất
+                                                </button>
+                                            </form> *@
+                                            <form action="/Identity/Account/Logout" method="post">
+                                                <input type="hidden" name="returnUrl" value="@Url.Action("Index", "Home", new { area = "" })" />
+                                                <button type="submit" class="nav-link btn btn-link text-dark">Đăng xuất</button>
+                                            </form>
+
                                         </div>
                                     </li>
                                 </ul>
@@ -208,6 +215,7 @@
     <!-- Volt JS -->
     <script src="~/Client/js/sweetalert.min.js"></script>
     <script src="~/Admin/assets/js/volt.js"></script>
+    
     @RenderSection("Script", required: false)
 
 </body>

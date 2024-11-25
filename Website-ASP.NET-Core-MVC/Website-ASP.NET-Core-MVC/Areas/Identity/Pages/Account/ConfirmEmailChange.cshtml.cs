@@ -28,7 +28,7 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
         [TempData]
         public string StatusMessage { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string userId, string email, string code)
+        public async Task<IActionResult> OnGetAsync(string userId, string email, string code, string returnUrl = null)
         {
             if (userId == null || email == null || code == null)
             {
@@ -46,24 +46,22 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
             if (!result.Succeeded)
             {
                 StatusMessage = "Lỗi thay đổi email.";
-                return Page();
+                return returnUrl == null ? Page() : LocalRedirect(returnUrl);
             }
 
-            // In our UI email and user name are one and the same, so when we update the email
-            // we need to update the user name.
             var setUserNameResult = await _userManager.SetUserNameAsync(user, email);
             if (!setUserNameResult.Succeeded)
             {
-                StatusMessage = "Lỗi thay đổi Username.";
-                return Page();
+                StatusMessage = "Lỗi thay đổi username.";
+                return returnUrl == null ? Page() : LocalRedirect(returnUrl);
             }
 
             var userCurrent = await _userManager.GetUserAsync(User);
             if (userCurrent.Id == userId)
                 await _signInManager.RefreshSignInAsync(user);
 
-            StatusMessage = "Cảm ơn bạn đã xác nhận thay đổi email.";
-            return Page();
+            StatusMessage = "Lỗi thay đổi email.";
+            return returnUrl == null ? Page() : LocalRedirect(returnUrl);
         }
     }
 }
