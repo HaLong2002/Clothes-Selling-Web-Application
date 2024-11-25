@@ -119,7 +119,7 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 					Address = model.Address?.Trim(),
 					Date = model.Date,
 					Gender = model.Gender?.Trim(),
-					Image = "/Images/CustomerAvatars/default-avatar.png"
+					Image = null
 				};
 
 				var result = await _userManager.CreateAsync(client, model.Password);
