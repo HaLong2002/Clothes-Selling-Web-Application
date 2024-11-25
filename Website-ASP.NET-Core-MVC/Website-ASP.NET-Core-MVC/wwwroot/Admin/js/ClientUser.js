@@ -41,35 +41,109 @@ function loadData(id) {
 
 //Ajax thêm tài khoản
 function themTaiKhoan() {
-    let data = {};
     let formData = $('#add-form').serializeArray();
-    formData.forEach(field => data[field.name] = field.value);
+    let data = {};
 
+    // Convert form data to object with proper null handling
+    $.each(formData, function (index, item) {
+        // Trim the value
+        let value = item.value.trim();
 
-    const emailInput = document.getElementById("themEmail"); // Get the input element
-    const email = emailInput.value; // Get the input value
+        // Handle optional fields - convert empty strings to null
+        switch (item.name) {
+            case 'PhoneNumber':
+            case 'Address':
+            case 'Gender':
+                data[item.name] = value === '' ? null : value;
+                break;
+            case 'Date':
+                data[item.name] = value === '' ? null : value;
+                break;
+            default:
+                data[item.name] = value;
+        }
+    });
+
+    const emailInput = document.getElementById("themEmail");
+    const email = emailInput.value.trim();
     const emailPattern = /^[a-z0-9._%+-]+@gmail\.com$/i;
 
+    // Required field validations
+    if (!email) {
+        swal({
+            title: "Thất bại!",
+            text: "Email không được để trống!",
+            icon: "error",
+            button: "OK"
+        });
+        return false;
+    }
+
     if (!emailPattern.test(email)) {
-        $("#add-message").html("Email không hợp lệ !").addClass("text-danger");
-        return false;
-    }
-    
-    if (data["Password"] != data["ConfirmPassword"]) {
-        $("#add-message").html("Mật khẩu không khớp !").addClass("text-danger");
+        swal({
+            title: "Thất bại!",
+            text: "Email không hợp lệ!",
+            icon: "error",
+            button: "OK"
+        });
         return false;
     }
 
-    console.log("Data da nhap:", data);
+    if (!data.FullName) {
+        swal({
+            title: "Thất bại!",
+            text: "Họ và tên không được để trống!",
+            icon: "error",
+            button: "OK"
+        });
+        return false;
+    }
 
-    // Rest of the code remains the same
+    if (!data.Password) {
+        swal({
+            title: "Thất bại!",
+            text: "Mật khẩu không được để trống!",
+            icon: "error",
+            button: "OK"
+        });
+        return false;
+    }
+
+    if (data.Password !== data.ConfirmPassword) {
+        swal({
+            title: "Thất bại!",
+            text: "Mật khẩu không khớp!",
+            icon: "error",
+            button: "OK"
+        });
+        return false;
+    }
+
+    // Phone number validation if provided
+    if (data.PhoneNumber) {
+        const phonePattern = /^\d{10}$/;
+        if (!phonePattern.test(data.PhoneNumber)) {
+            swal({
+                title: "Thất bại!",
+                text: "Số điện thoại phải chứa đúng 10 chữ số!",
+                icon: "error",
+                button: "OK"
+            });
+            return false;
+        }
+    }
+
+    console.log("Sending data:", data);
+
+    // AJAX request
     $.ajax({
         url: '/Admin/ClientUser/Create',
-        type: 'post',
+        type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(data),
         dataType: 'json',
         success: function (response) {
+            console.log("Response received:", response);
             if (response.status) {
                 swal({
                     title: "Thêm thành công!",
@@ -80,14 +154,30 @@ function themTaiKhoan() {
                     window.location.replace("/Admin/ClientUser");
                 });
             } else {
-                $("#add-message").html(response.message).addClass("text-danger").removeClass("text-success");
+                swal({
+                    title: "Thất bại!",
+                    text: response.message,
+                    icon: "error",
+                    button: "OK"
+                });
             }
         },
-        error: function (jqXHR) {
-            console.log("Error response:", jqXHR.responseText);
-            $("#add-message").html("Có lỗi xảy ra. Vui lòng thử lại.").addClass("text-danger");
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.error("Error details:", {
+                status: jqXHR.status,
+                statusText: jqXHR.statusText,
+                responseText: jqXHR.responseText
+            });
+
+            swal({
+                title: "Lỗi!",
+                text: "Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau.",
+                icon: "error",
+                button: "OK"
+            });
         }
     });
+
     return false;
 }
 
@@ -156,6 +246,43 @@ function doiEmail() {
         url: '/Admin/ClientUser/ChangeEmail',
         type: 'GET',
         data: { id: userId, email: email }, // Send `id` and `email` as query parameters
+        success: function (response) {
+            if (response.status) {
+                swal({
+                    title: "Thành công!",
+                    text: response.message,
+                    icon: "success",
+                    button: "OK",
+                }).then(function () {
+                    window.location.replace("/Admin/ClientUser");
+                });
+            }
+            else {
+                swal({
+                    title: "Thất bại!",
+                    text: response.message,
+                    icon: "error",
+                    button: "OK",
+                })
+            }
+        },
+        error: function (response) {
+            swal({
+                title: "Lỗi!",
+                text: "Có lỗi khi gửi yêu cầu. Vui lòng thử lại.",
+                icon: "error",
+                button: "OK",
+            });
+            console.error(response);
+        }
+    });
+}
+
+function guiEmailXacNhan(id) {
+    $.ajax({
+        url: '/Admin/ClientUser/SendEmailConfirmation',
+        type: 'GET',
+        data: { "id": id },
         success: function (response) {
             if (response.status) {
                 swal({

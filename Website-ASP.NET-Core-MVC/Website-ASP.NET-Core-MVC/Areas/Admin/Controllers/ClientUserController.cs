@@ -60,7 +60,8 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 					Address = user.Address,
 					Date = user.Date,
 					Gender = user.Gender,
-					LockoutStatus = await IsAccountLocked(user.Id)
+					LockoutStatus = await IsAccountLocked(user.Id),
+					EmailConfirmed = user.EmailConfirmed,
 				});
 			}
 
@@ -79,65 +80,94 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 		[HttpPost]
 		public async Task<JsonResult> Create([FromBody] CreateAccountClient model)
 		{
-			if(model == null)
+			try
+			{
+				if (model == null)
+				{
+					return Json(new { status = false, message = "Dữ liệu không hợp lệ." });
+				}
+
+				if (!ModelState.IsValid)
+				{
+					var errorsModel = ModelState.Values
+						.SelectMany(v => v.Errors)
+						.Select(e => e.ErrorMessage);
+					return Json(new { status = false, message = string.Join(", ", errorsModel) });
+				}
+
+				if (string.IsNullOrEmpty(model.Email))
+				{
+					return Json(new { status = false, message = "Email không được để trống." });
+				}
+
+				var existingUser = await _userManager.FindByEmailAsync(model.Email.Trim());
+				if (existingUser != null)
+				{
+					return Json(new
+					{
+						status = false,
+						message = "Email đã được sử dụng. Vui lòng chọn email khác."
+					});
+				}
+
+				var client = new User
+				{
+					UserName = model.Email.Trim(),
+					Email = model.Email.Trim(),
+					FullName = model.FullName?.Trim(),
+					PhoneNumber = model.PhoneNumber?.Trim(),
+					Address = model.Address?.Trim(),
+					Date = model.Date,
+					Gender = model.Gender?.Trim(),
+					Image = "/Images/CustomerAvatars/default-avatar.png"
+				};
+
+				var result = await _userManager.CreateAsync(client, model.Password);
+				if (result.Succeeded)
+				{
+					await _userManager.AddToRoleAsync(client, Enums.Roles.Customer.ToString());
+
+					// Generate email confirmation token and URL
+					var userId = await _userManager.GetUserIdAsync(client);
+					var code = await _userManager.GenerateEmailConfirmationTokenAsync(client);
+					code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+					var callbackUrl = Url.Page(
+						"/Account/ConfirmEmail",
+						pageHandler: null,
+						values: new { area = "Identity", userId = userId, code = code },
+						protocol: Request.Scheme);
+
+					await _emailSender.SendEmailAsync(
+						client.Email,
+						"Xác nhận Email của bạn",
+						$"Vui lòng xác nhận tài khoản tại đây <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+					return Json(new
+					{
+						status = true,
+						message = "Email xác nhận đã được gửi. Hãy kiểm tra hộp thư của bạn !"
+					});
+				}
+
+				var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+				return Json(new { status = false, message = errors });
+			}
+			catch (Exception ex)
+			{
+				// Log the exception here
 				return Json(new
 				{
 					status = false,
-					message = "Model null."
-				});
-
-			var existingUser = await _userManager.FindByEmailAsync(model.Email);
-			if (existingUser != null)
-			{
-				return Json(new
-				{
-					status = false,
-					message = "Email đã được sử dụng. Vui lòng chọn email khác."
+					message = "Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau."
 				});
 			}
-
-			var client = new User
-			{
-				UserName = model.Email,
-				Email = model.Email,
-				FullName = model.FullName,
-				PhoneNumber = model.PhoneNumber,
-				Address = model.Address,
-				Date = model.Date,
-				Gender = model.Gender,
-				Image = "/Images/CustomerAvatars/default-avatar.png"
-			};
-
-			var result = await _userManager.CreateAsync(client, model.Password);
-
-			if (result.Succeeded)
-			{
-				await _userManager.AddToRoleAsync(client, Enums.Roles.Customer.ToString());
-
-				// Gửi email xác nhận
-				var userId = await _userManager.GetUserIdAsync(client);
-				var code = await _userManager.GenerateEmailConfirmationTokenAsync(client);
-				code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-				var callbackUrl = Url.Page(
-					"/Account/ConfirmEmail",
-					pageHandler: null,
-					values: new { area = "Identity", userId = userId, code = code},
-					protocol: Request.Scheme);
-
-				await _emailSender.SendEmailAsync(client.Email, "Xác nhận Email của bạn",
-					$"Vui lòng xác nhận tài khoản tại đây <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-				return Json(new { status = true, message = "Email xác nhận đã được gửi. Hãy kiểm tra hộp thư của bạn !" });
-				//return Json(new { status = true, message = "Thêm tài khoản thành công!" });
-			}
-
-			var addErrors = string.Join("; ", result.Errors.Select(e => e.Description));
-			return Json(new { status = false, message = $"{addErrors}" });
 		}
 
 		[HttpPost]
 		public async Task<JsonResult> Index(string id)
 		{
+			Console.WriteLine("Index is called");
 			var tk = await _userManager.FindByIdAsync(id);
 
 			if (tk == null)
@@ -282,6 +312,29 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 			// Send the email
 			var emailContent = $"Please confirm your email change by clicking <a href='{callbackUrl}'>here</a>.";
 			await _emailSender.SendEmailAsync(email, "Confirm Email Change", emailContent);
+
+			return Json(new { status = true, message = "Email xác nhận đã được gửi. Hãy kiểm tra hộp thư của bạn !" });
+		}
+
+		[HttpGet]
+		public async Task<JsonResult> SendEmailConfirmation(string id)
+		{
+			var user = await _userManager.FindByIdAsync(id);
+			if (user == null)
+			{
+				return Json(new { status = false, message = "Không tìm thấy người dùng !" });
+			}
+
+			var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+			code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+			var callbackUrl = Url.Page(
+				"/Account/ConfirmEmail",
+				pageHandler: null,
+				values: new { area = "Identity", userId = id, code = code },
+				protocol: Request.Scheme);
+			await _emailSender.SendEmailAsync(
+				user.Email, "Xác nhận Email của bạn",
+				$"Vui lòng xác nhận tài khoản tại đây <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
 			return Json(new { status = true, message = "Email xác nhận đã được gửi. Hãy kiểm tra hộp thư của bạn !" });
 		}

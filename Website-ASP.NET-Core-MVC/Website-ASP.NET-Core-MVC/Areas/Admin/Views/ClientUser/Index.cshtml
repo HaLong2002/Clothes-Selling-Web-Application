@@ -39,6 +39,7 @@
 				<th>Địa chỉ</th>
 				<th>Ngày sinh</th>
 				<th>Giới tính</th>
+				<th>Xác nhận Email</th>
 				<th>Trạng thái</th>
 				<th>Tùy chọn</th>
 			</tr>
@@ -58,7 +59,26 @@
 						</span>
 					</td>
 					<td><span class="font-weight-normal">@item.Gender</span></td>
-					<td><span class="font-weight-bold text-success">@(item.LockoutStatus ? "Khóa" : "Không khóa")</span></td>
+					<td>
+						@if (@item.EmailConfirmed == false)
+						{
+							<span class="font-weight-bold text-danger">Chưa xác nhận</span>
+						}
+						else
+						{
+							<span class="font-weight-bold text-success">Đã xác nhận</span>
+						}
+					</td>
+					<td>
+						@if (@item.LockoutStatus == true)
+						{
+							<span class="font-weight-bold text-danger">Khóa</span>
+						}
+						else
+						{
+							<span class="font-weight-bold text-success">Không khóa</span>
+						}
+					</td>
 					<td>
 						<div class="btn-group">
 							<button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -68,11 +88,12 @@
 								<span class="sr-only">Danh mục lựa chọn</span>
 							</button>
 							<div class="dropdown-menu">
+								<button type="button" class="dropdown-item" onclick="guiEmailXacNhan('@item.Id')"><span class="fas fa-paper-plane mr-2"></span>Gửi lại email xác nhận</button>
 								<button class="dropdown-item change" onclick="loadData('@item.Id')">
 									<span class="fas fa-edit mr-2"></span>
 									Chỉnh sửa
 								</button>
-								<button class="dropdown-item text-danger delete" onclick="deleteData(@item.Id)"><span class="fas fa-trash-alt mr-2"></span>Xóa</button>
+								<button class="dropdown-item text-danger delete" onclick="deleteData('@item.Id')"><span class="fas fa-trash-alt mr-2"></span>Xóa</button>
 							</div>
 						</div>
 					</td>

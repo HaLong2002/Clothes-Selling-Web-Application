@@ -12,6 +12,7 @@
         public IFormFile? ImageFile { get; set; }
         public string? ExistingImage { get; set; }
         public bool LockoutStatus { get; set; }
+        public bool EmailConfirmed { get; set; }
 
     }
 }
