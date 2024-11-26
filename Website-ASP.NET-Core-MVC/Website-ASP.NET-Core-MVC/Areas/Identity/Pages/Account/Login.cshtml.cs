@@ -90,12 +90,23 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
 				if (result.Succeeded)
 				{
 					_logger.LogInformation("User logged in.");
-					return LocalRedirect(returnUrl);
+
+					var user = await _userManager.FindByEmailAsync(username);
+
+					var roles = await _userManager.GetRolesAsync(user);
+
+					// Kiểm tra xem người dùng có vai trò 'Customer' không
+					if (roles.Contains("Customer"))
+					{
+						return LocalRedirect(returnUrl); // Trở lại trang trước đó nếu là Customer
+					}
+					else
+					{
+						// Nếu không phải Customer, chuyển hướng đến trang Admin
+						return RedirectToAction("Index", "Home", new { area = "Admin" });
+					}
 				}
-				//if (result.RequiresTwoFactor)
-				//{
-				//    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
-				//}
+
 				if (result.IsLockedOut)
 				{
 					_logger.LogWarning("Tài khoản của bạn đã bị khóa.");
@@ -105,7 +116,7 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
 				}
 				else
 				{
-					ModelState.AddModelError(string.Empty, "Không thể đăng nhập. Vui lòng kiểm tra thông tin đăng nhập của bạn và đảm bảo tài khoản của bạn đã được xác nhận.");
+					ModelState.AddModelError(string.Empty, "Không thể đăng nhập. \nVui lòng kiểm tra thông tin đăng nhập của bạn và đảm bảo tài khoản của bạn đã được xác nhận.");
 					return Page();
 				}
 			}

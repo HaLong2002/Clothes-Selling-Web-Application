@@ -11,9 +11,17 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
     <!-- Primary Meta Tags -->
     <title>@ViewBag.Title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    @* <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> *@
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="120x120" href="~/Admin/assets/img/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="~/Admin/assets/img/favicon/favicon-32x32.png">
@@ -42,7 +50,7 @@
 
     <nav class="navbar navbar-dark navbar-theme-primary px-4 col-12 d-md-none">
         <a class="navbar-brand mr-lg-5" href="#">
-            <img class="navbar-brand-dark" src="~/Admin/assets/img/brand/light.svg" alt="Volt logo" /> <img class="navbar-brand-light" src="~/Admin/assets/img/brand/dark.svg" alt="Volt logo" />
+            <img class="navbar-brand-dark" src="~/Admin/css/assets/img/brand/light.svg" alt="Volt logo" /> <img class="navbar-brand-light" src="~/Admin/css/assets/img/brand/dark.svg" alt="Volt logo" />
         </a>
         <div class="d-flex align-items-center">
             <button class="navbar-toggler d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,7 +67,7 @@
                         <div class="user-card d-flex d-md-none align-items-center justify-content-between justify-content-md-center pb-4">
                             <div class="d-flex align-items-center">
                                 <div class="user-avatar lg-avatar mr-4">
-                                    <img src="~/Admin/assets/img/team/profile-picture-3.jpg" class="card-img-top rounded-circle border-white" alt="Bonnie Green">
+                                    <img src="~/Admin/css/assets/img/team/profile-picture-3.jpg" class="card-img-top rounded-circle border-white" alt="Bonnie Green">
                                 </div>
                                 <div class="d-block">
                                     <h2 class="h6">Hi, @currentUser.FullName</h2>
@@ -90,7 +98,6 @@
                                     <span>Sản phẩm</span>
                                 </a>
                             </li>
-
                             <li class='nav-item  @(ViewContext.RouteData.Values["controller"].ToString() == "Bill"? "active" : "" )'>
                                 <a href="@Url.Action("Index","Bill")" class="nav-link">
                                     <span class="sidebar-icon"><span class="fas fa-money-bill"></span></span>
@@ -99,6 +106,12 @@
                             </li>
                             @if (/*tk.LoaiTaiKhoan == true*/ User.IsInRole("SuperAdmin"))
                             {
+                                <li class='nav-item  @(ViewContext.RouteData.Values["controller"].ToString() == "RoleManager"? "active" : "" )'>
+                                    <a href="@Url.Action("Index","RoleManager")" class="nav-link">
+                                        <span class="sidebar-icon"><span class="fas fa-user-shield"></span></span>
+                                        <span>Loại tài khoản</span>
+                                    </a>
+                                </li>
                                 <li class='nav-item  @(ViewContext.RouteData.Values["controller"].ToString() == "AdminUser"? "active" : "") '>
                                     <a href="@Url.Action("Index","AdminUser")" class="nav-link">
                                         <span class="sidebar-icon"><span class="fas fa-user-alt"></span></span>
@@ -128,7 +141,7 @@
                                     <li class="nav-item dropdown">
                                         <a class="nav-link pt-1 px-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <div class="media d-flex align-items-center">
-                                                <img class="user-avatar md-avatar rounded-circle" alt="Image placeholder" src="~/Admin/assets/img/team/profile-picture-3.jpg">
+                                                <img class="user-avatar md-avatar rounded-circle" alt="Image placeholder" src="~/Admin/css/assets/img/team/profile-picture-3.jpg">
                                                 <div class="media-body ml-2 text-dark align-items-center d-none d-lg-block">
                                                     <span class="mb-0 font-small font-weight-bold">@currentUser.FullName</span>
                                                 </div>
@@ -138,18 +151,12 @@
                                             @*<a class="dropdown-item font-weight-bold" href="#"><span class="far fa-user-circle"></span>Thông tin cá nhân</a>
                                             <a class="dropdown-item font-weight-bold" href="#"><span class="fas fa-cog"></span>Cài đặt</a>*@
                                             @* <div role="separator" class="dropdown-divider"></div> *@
-                                            @* <a class="dropdown-item font-weight-bold" href="@Url.Action("Logout","Login")"><span class="fas fa-sign-out-alt text-danger"></span>Đăng xuất</a> *@
-                                            @* <form class="dropdown-item font-weight-bold d-inline-block" action="/Identity/Account/Logout" method="post" id="logoutForm">
-                                                <button type="submit" class="nav-link btn btn-link text-dark">
+                                            <form class="dropdown-item d-inline-block" asp-area="Identity" asp-page="/Account/Logout" method="post" id="logoutForm">
+                                                <button type="submit" class="nav-link btn btn-link text-dark" style="padding: 0.5rem 1rem;">
                                                     <span class="fas fa-sign-out-alt text-danger"></span>
                                                     Đăng xuất
                                                 </button>
-                                            </form> *@
-                                            <form action="/Identity/Account/Logout" method="post">
-                                                <input type="hidden" name="returnUrl" value="@Url.Action("Index", "Home", new { area = "" })" />
-                                                <button type="submit" class="nav-link btn btn-link text-dark">Đăng xuất</button>
                                             </form>
-
                                         </div>
                                     </li>
                                 </ul>
@@ -214,7 +221,7 @@
 
     <!-- Volt JS -->
     <script src="~/Client/js/sweetalert.min.js"></script>
-    <script src="~/Admin/assets/js/volt.js"></script>
+    <script src="~/Admin/css/assets/js/volt.js"></script>
     
     @RenderSection("Script", required: false)
 

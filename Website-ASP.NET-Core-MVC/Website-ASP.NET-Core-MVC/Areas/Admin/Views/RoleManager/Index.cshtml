@@ -1,36 +1,147 @@
 ﻿@model List<Microsoft.AspNetCore.Identity.IdentityRole>
 @{
-	ViewData["Title"] = "Quản lý vai trò";
-	Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewData["Title"] = "Loại tài khoản";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+	//Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<h3>Quản lý vai trò</h3>
-<hr/>
+<h2 class="h4 mb-4">Loại tài khoản</h2>
 
-<div class="col-md-6">
+<div class="col-md-6 mb-4">
 	<form method="post" asp-action="AddRole" asp-controller="RoleManager">
 		<div class="input-group">
-			<input name="roleName" class="form-control" placeholder="Nhập tên vai trò">
+			<input name="roleName" class="form-control" placeholder="Loại tài khoản">
 			<span class="input-group-btn">
-				<button class="btn btn-info">Thêm vai trò mới</button>
+				<button type="submit" class="btn btn-info">Thêm loại tài khoản</button>
 			</span>
 		</div>
 	</form>
 </div>
 
-<table class="table table-striped">
-	<thead>
-		<tr>
-			<th>Id</th>
-			<th>Vai trò</th>
-		</tr>
-	</thead>
-	<tbody>
-		@foreach (var role in Model)
-		{
+@if (ViewBag.Message != null)
+{
+	<div class="alert">@ViewBag.Message</div>
+}
+
+<div class="card card-body border-light shadow-sm table-wrapper table-responsive pt-0">
+	<table class="table table-hover">
+		<thead>
 			<tr>
-				<td>@role.Id</td>
-				<td>@role.Name</td>
+				<th>Loại tài khoản</th>
+				<th>Tùy chọn</th>
 			</tr>
-		}
-	</tbody>
-</table>
+		</thead>
+		<tbody>
+			@foreach (var role in Model)
+			{
+				<tr>
+					<td>@role.Name</td>
+					<td>
+						<div class="btn-group">
+							<button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<span class="icon icon-sm">
+									<span class="fas fa-ellipsis-h icon-dark"></span>
+								</span>
+								<span class="sr-only">Danh mục lựa chọn</span>
+							</button>
+							<div class="dropdown-menu">
+								<button type="button" class="dropdown-item btn-edit" data-role-id="@role.Id" data-role-name="@role.Name" data-bs-toggle="modal" data-bs-target="#editRoleModal">
+									<span class="fas fa-edit mr-2"></span>
+									Chỉnh sửa
+								</button>
+								<button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteRoleModal" data-role-id="@role.Id" data-role-name="@role.Name">
+									<span class="fas fa-edit mr-2"></span>
+									Xóa
+								</button>
+							</div>
+						</div>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>
+
+<!-- Edit Modal HTML -->
+<div class="modal fade" id="editRoleModal" tabindex="-1" aria-labelledby="editRoleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="editRoleModalLabel">Chỉnh sửa loại tài khoản</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form method="post" asp-action="Update" asp-controller="RoleManager">
+				<div class="modal-body">
+					<input type="hidden" name="RoleId" id="editRoleId">
+					<div class="mb-3">
+						<label for="editRoleName" class="form-label">Loại tài khoản</label>
+						<input type="text" class="form-control" id="editRoleName" name="RoleName" required>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+					<button type="submit" class="btn btn-primary">Lưu</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteRoleModal" tabindex="-1" aria-labelledby="deleteRoleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="deleteRoleModalLabel">Xác nhận xóa</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form method="post" asp-action="DeleteRole" asp-controller="RoleManager">
+				<div class="modal-body">
+					<p>Bạn có chắc chắn muốn xóa loại tài khoản: <strong id="roleNameToDelete"></strong>?</p>
+					<input type="hidden" id="roleIdToDelete" name="roleId" />
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+					<button type="submit" class="btn btn-danger">Xóa</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+@section Script {
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const editRoleModal = document.getElementById('editRoleModal');
+			editRoleModal.addEventListener('show.bs.modal', function (event) {
+				const button = event.relatedTarget; // Button that triggered the modal
+				const roleId = button.getAttribute('data-role-id');
+				const roleName = button.getAttribute('data-role-name');
+
+				// Populate the modal with role data
+				document.getElementById('editRoleId').value = roleId;
+				document.getElementById('editRoleName').value = roleName;
+			});
+		});
+
+		document.addEventListener('DOMContentLoaded', function () {
+			const deleteRoleModal = document.getElementById('deleteRoleModal');
+			deleteRoleModal.addEventListener('show.bs.modal', function (event) {
+				const button = event.relatedTarget; // Button that triggered the modal
+				const roleId = button.getAttribute('data-role-id');
+				const roleName = button.getAttribute('data-role-name');
+
+				// Set values in modal
+				document.getElementById('roleIdToDelete').value = roleId;
+				document.getElementById('roleNameToDelete').textContent = roleName;
+			});
+		});
+		
+	</script>
+
+	@if (TempData["ErrorMessage"] != null)
+	{
+		<script>
+			alert(@Html.Raw(Json.Serialize(TempData["ErrorMessage"])));
+		</script>
+	}
+}
