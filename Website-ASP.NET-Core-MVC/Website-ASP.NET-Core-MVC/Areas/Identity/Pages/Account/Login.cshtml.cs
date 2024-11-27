@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Website_ASP.NET_Core_MVC.Models;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
 {
@@ -70,10 +72,31 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
 			// Clear the existing external cookie to ensure a clean login process
 			await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
-			//ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+			//await HttpContext.ChallengeAsync(GoogleDefaults.AuthenticationScheme,
+			//	new AuthenticationProperties
+			//	{
+			//		RedirectUri = Url.Action("GoogleResponse")
+			//	});
+
+			ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
 			ReturnUrl = returnUrl;
 		}
+
+		//public async Task<IActionResult> GoogleResponse()
+		//{
+		//	var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+		//	var claims = result.Principal.Identities.FirstOrDefault().Claims.Select(claim => new
+		//	{
+		//		claim.Issuer,
+		//		claim.OriginalIssuer,
+		//		claim.Type,
+		//		claim.Value
+		//	});
+
+		//	return new JsonResult(claims);
+		//}
 
 		public async Task<IActionResult> OnPostAsync(string returnUrl = null)
 		{

@@ -1,17 +1,25 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Configuration;
 using Website_ASP.NET_Core_MVC.Data;
 using Website_ASP.NET_Core_MVC.Models;
 using Website_ASP.NET_Core_MVC.Services;
-using Website_ASP.NET_Core_MVC.ViewModels;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+})
+    .AddCookie()
+    .AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
+    {
+        options.ClientId = builder.Configuration.GetSection("GoogleKeys:ClientId").Value;
+        options.ClientSecret = builder.Configuration.GetSection("GoogleKeys:ClientSecret").Value;
+    }); 
 
 // Add Email
 builder.Services.AddTransient<IEmailSender, EmailSender>();
@@ -20,6 +28,8 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllersWithViews()
             .AddRazorRuntimeCompilation(); // Enable runtime compilation
+
+builder.Services.AddControllers().AddNewtonsoftJson();
 
 // Add the database context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
