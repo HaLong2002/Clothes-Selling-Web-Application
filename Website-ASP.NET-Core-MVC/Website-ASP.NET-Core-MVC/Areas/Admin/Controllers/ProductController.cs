@@ -175,7 +175,40 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 		public JsonResult Index(int id)
 		{
 			SanPham sp = _context.SanPhams.Include("SanPhamChiTiets").Include("DanhMuc").Where(s => s.MaSP.Equals(id)).FirstOrDefault();
-			return Json(sp);
+
+            var productViewModel = new
+            {
+                sp.MaSP,
+                sp.MaDM,
+                sp.TenSP,
+                sp.Gia,
+                sp.MoTa,
+                sp.ChatLieu,
+                sp.HuongDan,
+                sp.NgayTao,
+                sp.NguoiTao,
+                sp.NgaySua,
+                sp.NguoiSua,
+                sp.MaMau,
+                sp.HinhAnh,
+                DanhMuc = new
+                {
+                    sp.DanhMuc.MaDM,
+                    sp.DanhMuc.TenDanhMuc,
+                    sp.DanhMuc.NgayTao,
+                    sp.DanhMuc.NguoiTao,
+                    sp.DanhMuc.NgaySua,
+                    sp.DanhMuc.NguoiSua
+                },
+                SanPhamChiTiets = sp.SanPhamChiTiets.Select(sct => new
+                {
+                    sct.IDCTSP,
+                    sct.MaKichCo,
+                    sct.SoLuong
+                }).ToList()
+            };
+
+            return Json(productViewModel);
 		}
 	}
 }

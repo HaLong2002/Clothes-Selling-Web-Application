@@ -60,7 +60,7 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
             if (userCurrent.Id == userId)
                 await _signInManager.RefreshSignInAsync(user);
 
-            StatusMessage = "Lỗi thay đổi email.";
+            StatusMessage = "Thay đổi email thành công.";
             return returnUrl == null ? Page() : LocalRedirect(returnUrl);
         }
     }

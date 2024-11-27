@@ -81,14 +81,13 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
 		{
 			returnUrl ??= Url.Content("~/");
 
-			//ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+			ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
 			if (ModelState.IsValid)
 			{
 				var username = Input.Email;
 
-				//var result = await _signInManager.PasswordSignInAsync(username, Input.Password, Input.RememberMe, lockoutOnFailure: true);
-				var result = await _signInManager.PasswordSignInAsync(username, Input.Password, true, lockoutOnFailure: true);
+				var result = await _signInManager.PasswordSignInAsync(username, Input.Password, Input.RememberMe, lockoutOnFailure: true);
 				if (result.Succeeded)
 				{
 					_logger.LogInformation("User logged in.");

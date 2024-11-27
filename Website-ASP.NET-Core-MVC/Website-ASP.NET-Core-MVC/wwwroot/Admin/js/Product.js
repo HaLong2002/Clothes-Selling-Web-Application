@@ -18,9 +18,8 @@ function loadData(id) {
             $("#mota").val(response.moTa);
             $("#huongdan").val(response.huongDan);
 
-            let items = response.sanPhamChiTiets.$values;
+            let items = response.sanPhamChiTiets;
             console.log("San Pham Chi Tiet:", items);
-
 
             $.each(items, function (index) {
                 $("#update-" + items[index].maKichCo).val(items[index].idctsp);

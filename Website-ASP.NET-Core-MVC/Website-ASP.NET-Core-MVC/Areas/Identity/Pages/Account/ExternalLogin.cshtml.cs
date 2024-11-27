@@ -26,8 +26,8 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
-        private readonly IUserStore<User> _userStore;
-        private readonly IUserEmailStore<User> _emailStore;
+        //private readonly IUserStore<User> _userStore;
+        //private readonly IUserEmailStore<User> _emailStore;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
 
@@ -40,8 +40,8 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
         {
             _signInManager = signInManager;
             _userManager = userManager;
-            _userStore = userStore;
-            _emailStore = GetEmailStore();
+            //_userStore = userStore;
+            //_emailStore = GetEmailStore();
             _logger = logger;
             _emailSender = emailSender;
         }
@@ -61,8 +61,11 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
             [Required]
             [EmailAddress]
             public string Email { get; set; }
+
+            public string FullName { get; set; }
+
         }
-        
+
         public IActionResult OnGet() => RedirectToPage("./Login");
 
         public IActionResult OnPost(string provider, string returnUrl = null)
@@ -78,123 +81,102 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
             returnUrl = returnUrl ?? Url.Content("~/");
             if (remoteError != null)
             {
-                ErrorMessage = $"Error from external provider: {remoteError}";
+                ErrorMessage = $"Lỗi từ nhà cung cấp bên ngoài: {remoteError}";
                 return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
-                ErrorMessage = "Error loading external login information.";
+                ErrorMessage = "Có lỗi khi tải thông tin đăng nhập bên ngoài.";
                 return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
 
-            // Sign in the user with this external login provider if the user already has a login.
+            // Đăng nhập nếu tài khoản đã tồn tại và đã liên kết với nhà cung cấp
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: true, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
+                _logger.LogInformation("{Name} đã đăng nhập bằng nhà cung cấp {LoginProvider}.", info.Principal.Identity.Name, info.LoginProvider);
                 return LocalRedirect(returnUrl);
             }
+
+            var user1 = await _userManager.FindByEmailAsync(info.Principal.FindFirstValue(ClaimTypes.Email));
+            if (user1 != null)
+            {
+                // Nếu tài khoản đã đăng ký bằng mật khẩu nhưng chưa liên kết với Google
+                var logins = await _userManager.GetLoginsAsync(user1);
+                if (logins.All(l => l.LoginProvider != info.LoginProvider))
+                {
+                    var addLoginResult = await _userManager.AddLoginAsync(user1, info);
+                    if (addLoginResult.Succeeded)
+                    {
+                        _logger.LogInformation("Tài khoản {Email} đã được liên kết với nhà cung cấp {LoginProvider}.", user1.Email, info.LoginProvider);
+
+                        // Cập nhật EmailConfirmed = true
+                        user1.EmailConfirmed = true;
+                        await _userManager.UpdateAsync(user1);
+
+                        await _signInManager.SignInAsync(user1, isPersistent: true);
+                        return LocalRedirect(returnUrl);
+                    }
+                    else
+                    {
+                        foreach (var error in addLoginResult.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                        return Page();
+                    }
+                }
+            }
+
             if (result.IsLockedOut)
             {
                 return RedirectToPage("./Lockout");
             }
             else
             {
-                // If the user does not have an account, then ask the user to create an account.
-                ReturnUrl = returnUrl;
-                ProviderDisplayName = info.ProviderDisplayName;
-                if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
+                // Nếu tài khoản chưa tồn tại, tạo mới
+                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                var fullName = info.Principal.FindFirstValue(ClaimTypes.Name);
+
+                if (email == null)
                 {
-                    Input = new InputModel
-                    {
-                        Email = info.Principal.FindFirstValue(ClaimTypes.Email)
-                    };
+                    ErrorMessage = "Không có email từ nhà cung cấp bên ngoài.";
+                    return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
                 }
+
+                var user = new User
+                {
+                    UserName = email,
+                    Email = email,
+                    FullName = fullName,
+                    EmailConfirmed = true,
+                };
+
+                var createResult = await _userManager.CreateAsync(user);
+                if (createResult.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, Enums.Roles.Customer.ToString());
+                    await _userManager.AddLoginAsync(user, info);
+
+                    _logger.LogInformation("Người dùng đã tạo một tài khoản bằng nhà cung cấp {Name}.", info.LoginProvider);
+
+                    await _signInManager.SignInAsync(user, isPersistent: true, info.LoginProvider);
+                    return LocalRedirect(returnUrl);
+                }
+
+                // Hiển thị lỗi nếu tạo tài khoản không thành công
+                foreach (var error in createResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+
+                ProviderDisplayName = info.ProviderDisplayName;
+                ReturnUrl = returnUrl;
                 return Page();
             }
         }
 
-        public async Task<IActionResult> OnPostConfirmationAsync(string returnUrl = null)
-        {
-            returnUrl = returnUrl ?? Url.Content("~/");
-            // Get the information about the user from the external login provider
-            var info = await _signInManager.GetExternalLoginInfoAsync();
-            if (info == null)
-            {
-                ErrorMessage = "Error loading external login information during confirmation.";
-                return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
-            }
-
-            if (ModelState.IsValid)
-            {
-                var user = CreateUser();
-
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-
-                var result = await _userManager.CreateAsync(user);
-                if (result.Succeeded)
-                {
-                    result = await _userManager.AddLoginAsync(user, info);
-                    if (result.Succeeded)
-                    {
-                        _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
-
-                        var userId = await _userManager.GetUserIdAsync(user);
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                        var callbackUrl = Url.Page(
-                            "/Account/ConfirmEmail",
-                            pageHandler: null,
-                            values: new { area = "Identity", userId = userId, code = code },
-                            protocol: Request.Scheme);
-
-                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-                        // If account confirmation is required, we need to show the link if we don't have a real email sender
-                        if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                        {
-                            return RedirectToPage("./RegisterConfirmation", new { Email = Input.Email });
-                        }
-
-                        await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
-                        return LocalRedirect(returnUrl);
-                    }
-                }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-            }
-
-            ProviderDisplayName = info.ProviderDisplayName;
-            ReturnUrl = returnUrl;
-            return Page();
-        }
-
-        private User CreateUser()
-        {
-            try
-            {
-                return Activator.CreateInstance<User>();
-            }
-            catch
-            {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(User)}'. " +
-                    $"Ensure that '{nameof(User)}' is not an abstract class and has a parameterless constructor, or alternatively " +
-                    $"override the external login page in /Areas/Identity/Pages/Account/ExternalLogin.cshtml");
-            }
-        }
-
-        private IUserEmailStore<User> GetEmailStore()
-        {
-            if (!_userManager.SupportsUserEmail)
-            {
-                throw new NotSupportedException("The default UI requires a user store with email support.");
-            }
-            return (IUserEmailStore<User>)_userStore;
-        }
+        
     }
 }

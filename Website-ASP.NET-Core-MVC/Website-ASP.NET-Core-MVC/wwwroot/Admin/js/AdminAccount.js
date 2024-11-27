@@ -63,7 +63,7 @@ function loadRoles() {
                 return;
             }
 
-            const allRoles = response.allRoles.$values;            
+            const allRoles = response.allRoles;            
 
             const rolesContainer = $("#add-roles");
             rolesContainer.empty(); // Clear previous content
@@ -101,7 +101,7 @@ function loadData(id) {
             }
 
             const user = response.user;
-            const allRoles = response.allRoles.$values;
+            const allRoles = response.allRoles;
            
             // Populate the form fields with data from the response
             $("#matk").val(user.id); // Ensure you use the correct path to the user object
@@ -112,7 +112,7 @@ function loadData(id) {
             rolesContainer.empty(); // Clear previous content
 
             allRoles.forEach(role => {
-                const isChecked = user.roles.$values.includes(role); // Check if the user has this role
+                const isChecked = user.roles.includes(role); // Check if the user has this role
                 const checkboxHtml = `
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" value="${role}" id="${role}-role" ${isChecked ? 'checked' : ''}>

@@ -114,8 +114,8 @@ function loadDuLieuChiTiet(id) {
             $("#hd-ghichu").html(response.hoadon.ghiChu);
 
             let total = 0;
-            let cthdItems = response.cthd.$values;
-            let spItems = response.sp.$values;
+            let cthdItems = response.cthd;
+            let spItems = response.sp;
 
             $.each(cthdItems, function (index, item) {
                 // Debug the structure of each item

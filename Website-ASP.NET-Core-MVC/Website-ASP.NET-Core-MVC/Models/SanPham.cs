@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Website_ASP.NET_Core_MVC.Models
 {
@@ -57,7 +58,8 @@ namespace Website_ASP.NET_Core_MVC.Models
 		[StringLength(150)]
 		public string HinhAnh { get; set; }
 
-		public virtual DanhMuc DanhMuc { get; set; }
+        //[JsonIgnore]
+        public virtual DanhMuc DanhMuc { get; set; }
 
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
 		public virtual ICollection<SanPhamChiTiet> SanPhamChiTiets { get; set; }

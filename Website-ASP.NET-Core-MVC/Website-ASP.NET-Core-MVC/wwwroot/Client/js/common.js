@@ -15,7 +15,7 @@ function loadSanPham(id) {
                 $("#modal-gia").html(response.gia.toLocaleString('it-IT', { style: 'currency', currency: 'VND' }));
                 $("#modal-mamau").val(response.maMau ? response.maMau.trim() : '');
 
-                let items = response.sanPhamChiTiets.$values;
+                let items = response.sanPhamChiTiets;
                 console.log("SanPhamChiTiet:", items);  // Moved inside success callback
 
                 $.each(items, function (index) {

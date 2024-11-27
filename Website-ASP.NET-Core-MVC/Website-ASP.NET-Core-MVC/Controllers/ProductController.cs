@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Website_ASP.NET_Core_MVC.Data;
 using Website_ASP.NET_Core_MVC.Models;
 using X.PagedList.Extensions;
@@ -45,7 +46,7 @@ namespace Website_ASP.NET_Core_MVC.Controllers
             ViewBag.Exitst = list[0];
             return View(sp);
         }
-     
+
         [HttpPost]
         public JsonResult Index(int id)
         {
@@ -62,8 +63,41 @@ namespace Website_ASP.NET_Core_MVC.Controllers
                     return Json(new { error = "Không tìm thấy sản phẩm" });
                 }
 
+                // Prepare a simpler model to return as JSON, avoiding circular references
+                var productViewModel = new
+                {
+                    sp.MaSP,
+                    sp.MaDM,
+                    sp.TenSP,
+                    sp.Gia,
+                    sp.MoTa,
+                    sp.ChatLieu,
+                    sp.HuongDan,
+                    sp.NgayTao,
+                    sp.NguoiTao,
+                    sp.NgaySua,
+                    sp.NguoiSua,
+                    sp.MaMau,
+                    sp.HinhAnh,
+                    DanhMuc = new
+                    {
+                        sp.DanhMuc.MaDM,
+                        sp.DanhMuc.TenDanhMuc,
+                        sp.DanhMuc.NgayTao,
+                        sp.DanhMuc.NguoiTao,
+                        sp.DanhMuc.NgaySua,
+                        sp.DanhMuc.NguoiSua
+                    },
+                    SanPhamChiTiets = sp.SanPhamChiTiets.Select(sct => new
+                    {
+                        sct.IDCTSP,
+                        sct.MaKichCo,
+                        sct.SoLuong
+                    }).ToList()
+                };
+
                 _logger.LogInformation($"Đã tải sản phẩm ID: {id}, MaDM: {sp.MaDM}");
-                return Json(sp);
+                return Json(productViewModel);
             }
             catch (Exception ex)
             {
@@ -71,7 +105,6 @@ namespace Website_ASP.NET_Core_MVC.Controllers
                 return Json(new { error = "Có lỗi xảy ra" });
             }
         }
-
 
         [HttpPost]
         public JsonResult Detail(int id)

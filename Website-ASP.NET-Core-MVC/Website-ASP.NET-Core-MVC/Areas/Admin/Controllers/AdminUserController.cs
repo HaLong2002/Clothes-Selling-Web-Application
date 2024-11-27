@@ -34,15 +34,16 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 
 			ViewBag.searchString = searchString;
 
-			var adminUsers = await _userManager.GetUsersInRoleAsync("Admin");
-			var superAdminUsers = await _userManager.GetUsersInRoleAsync("SuperAdmin");
+            var allUsers = await _userManager.Users.ToListAsync();
 
-			var taikhoans = adminUsers
-				.Union(superAdminUsers)
-				.Distinct()
-				.ToList();
+            var customerUsers = await _userManager.GetUsersInRoleAsync("Customer");
 
-			if (!String.IsNullOrEmpty(searchString))
+            // Exclude the users who are in the Customer role
+            var taikhoans = allUsers
+                .Except(customerUsers) // Exclude users who are in the Customer role
+                .ToList();
+
+            if (!String.IsNullOrEmpty(searchString))
 			{
 				taikhoans = taikhoans.Where(tk => tk.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
 			}

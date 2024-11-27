@@ -26,7 +26,7 @@ namespace Website_ASP.NET_Core_MVC.Controllers
 
             if (tk == null || tk.Id == null)
             {
-                return View("Error");
+                return View("NotFound");
             }
 
             list = _context.HoaDons
@@ -44,12 +44,12 @@ namespace Website_ASP.NET_Core_MVC.Controllers
             var tk = await _userManager.GetUserAsync(User);
             if (tk == null)
             {
-                return View("PageNotFound");
+                return View("NotFound");
             }
 
             if (_context.HoaDons.FirstOrDefault(x => x.MaTK == tk.Id) == null)
             {
-                return View("PageNotFound");
+                return View("NotFound");
             }
 
             HoaDon hd = _context.HoaDons
