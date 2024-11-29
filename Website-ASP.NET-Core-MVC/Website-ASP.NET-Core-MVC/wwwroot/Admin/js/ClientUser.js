@@ -66,7 +66,7 @@ function themTaiKhoan() {
 
     const emailInput = document.getElementById("themEmail");
     const email = emailInput.value.trim();
-    const emailPattern = /^[a-z0-9._%+-]+@gmail\.com$/i;
+    const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
 
     // Required field validations
     if (!email) {

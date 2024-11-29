@@ -2,7 +2,7 @@
 
 <div class="col-lg-5 col-md-8 ml-auto mr-auto col-10">
     <div class="categorie-search-box">
-        @using (Html.BeginForm("Shop", "Product", FormMethod.Get))
+        @using (Html.BeginForm("Shop", "Product", new { area = "" }, FormMethod.Get))
         {
             <div class="form-group">
                 <select class="bootstrap-select" name="madm">

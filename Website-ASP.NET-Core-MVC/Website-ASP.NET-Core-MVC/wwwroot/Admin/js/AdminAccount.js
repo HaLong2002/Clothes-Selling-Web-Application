@@ -13,6 +13,31 @@ function themTaiKhoanAdmin() {
         }
     });
 
+    const emailInput = document.getElementById("themEmail");
+    const email = emailInput.value.trim();
+    const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+
+    // Required field validations
+    if (!email) {
+        swal({
+            title: "Thất bại!",
+            text: "Email không được để trống!",
+            icon: "error",
+            button: "OK"
+        });
+        return false;
+    }
+
+    if (!emailPattern.test(email)) {
+        swal({
+            title: "Thất bại!",
+            text: "Email không hợp lệ!",
+            icon: "error",
+            button: "OK"
+        });
+        return false;
+    }
+
     console.log("Data da nhap khi them:", data);
 
     // Remove the commented-out roles validation if you want to require at least one role
@@ -105,7 +130,7 @@ function loadData(id) {
            
             // Populate the form fields with data from the response
             $("#matk").val(user.id); // Ensure you use the correct path to the user object
-            $("#email").val(user.email);
+            $("#suaEmail").val(user.email);
             $("#fullname").val(user.fullName);
 
             const rolesContainer = $("#roles");
@@ -152,6 +177,31 @@ function suaTaiKhoanQuanTri() {
     data["Roles"] = roles;
 
     console.log("Data to submit: ", data);
+
+    const emailInput = document.getElementById("suaEmail");
+    const email = emailInput.value.trim();
+    const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+
+    // Required field validations
+    if (!email) {
+        swal({
+            title: "Thất bại!",
+            text: "Email không được để trống!",
+            icon: "error",
+            button: "OK"
+        });
+        return false;
+    }
+
+    if (!emailPattern.test(email)) {
+        swal({
+            title: "Thất bại!",
+            text: "Email không hợp lệ!",
+            icon: "error",
+            button: "OK"
+        });
+        return false;
+    }
 
     $.ajax({
         url: '/Admin/AdminUser/Update',
