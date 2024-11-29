@@ -13,7 +13,7 @@ using X.PagedList.Extensions;
 namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,SuperAdmin")]
+    [Authorize(Roles = "Admin,SuperAdmin,Sale")]
     public class ProductController : Controller
 	{
 		private readonly ApplicationDbContext _context;
@@ -44,7 +44,8 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 			return View(sanphams.OrderBy(sp => sp.MaSP).ToPagedList(page, pageSize));
 		}
 
-		[HttpPost]
+        [Authorize(Roles = "Admin,SuperAdmin")]
+        [HttpPost]
 		public async Task<JsonResult> Create(string sanpham, string chiTiets, /*HttpPostedFileBase hinhanh*/ IFormFile hinhanh)
 		{
 			try
@@ -98,7 +99,8 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 			}
 		}
 
-		[HttpPost]
+        [Authorize(Roles = "Admin,SuperAdmin")]
+        [HttpPost]
 		public async Task<JsonResult> Update(string sanpham, string chiTiets, IFormFile hinhanh)
 		{
 			try
@@ -154,7 +156,8 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 			}
 		}
 
-		[HttpPost]
+        [Authorize(Roles = "Admin,SuperAdmin")]
+        [HttpPost]
 		public JsonResult Delete(int id)
 		{
 			try

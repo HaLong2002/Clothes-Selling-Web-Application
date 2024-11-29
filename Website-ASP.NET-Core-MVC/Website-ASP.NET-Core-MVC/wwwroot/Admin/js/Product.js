@@ -96,6 +96,41 @@ function themSanPham() {
     return false;
 }
 
+//load dữ liệu lên form chi tiet
+function loadDataDetail(id) {
+    $.ajax({
+        type: 'POST',
+        data: { "id": id },
+        url: '/Admin/Product/Index',
+        success: function (response) {
+            console.log("Response from server:", response);
+            $("#chititet-masp").val(response.maSP);
+            $("#chititet-anhsp").attr("src", response.hinhAnh);
+            $("#chititet-tensanpham").val(response.tenSP);
+            $("#chititet-gia").val(response.gia);
+            $("#chititet-danhmuc").val(response.maDM);
+            $("#chititet-chatlieu").val(response.chatLieu);
+            $("#chititet-mamau").val(response.maMau.trim());
+            $("#chititet-displaycolor").css('backgroundColor', response.maMau.trim());
+            $("#chititet-mota").val(response.moTa);
+            $("#chititet-huongdan").val(response.huongDan);
+
+            let items = response.sanPhamChiTiets;
+            console.log("San Pham Chi Tiet:", items);
+
+            $.each(items, function (index) {
+                $("#chititet-update-" + items[index].maKichCo).val(items[index].idctsp);
+                $("#chititet-kichco-" + items[index].maKichCo).val(items[index].soLuong);
+            })
+        },
+        error: function (xhr) {
+            //debugger;  
+            console.log(xhr.responseText);
+            alert("Error has occurred..");
+        }
+    });
+}
+
 
 //Ajax sửa sản phẩm
 function suaSanPham() {

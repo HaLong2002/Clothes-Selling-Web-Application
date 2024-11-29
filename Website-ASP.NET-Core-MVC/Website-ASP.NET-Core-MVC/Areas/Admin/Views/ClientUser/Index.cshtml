@@ -1,10 +1,15 @@
 ﻿@model X.PagedList.IPagedList<Website_ASP.NET_Core_MVC.Areas.Admin.Models.ClientUserViewModel>
 @using X.PagedList.Mvc.Core
 @using X.PagedList
+@using Microsoft.AspNetCore.Identity
+@using Website_ASP.NET_Core_MVC.Models
+@inject UserManager<User> UserManager
+
 <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css">
 @{
 	ViewBag.Title = "Tài khoản người dùng";
 	Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+	var currentUser = await UserManager.GetUserAsync(User);
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
@@ -93,7 +98,10 @@
 									Chỉnh sửa
 								</button>
 								<button type="button" class="dropdown-item" onclick="guiEmailXacNhan('@item.Id')"><span class="fas fa-paper-plane mr-2"></span>Gửi lại email xác nhận</button>
-								<button class="dropdown-item text-danger delete" onclick="deleteData('@item.Id')"><span class="fas fa-trash-alt mr-2"></span>Xóa</button>
+								@if (!User.IsInRole("Sale"))
+								{
+									<button class="dropdown-item text-danger delete" onclick="deleteData('@item.Id')"><span class="fas fa-trash-alt mr-2"></span>Xóa</button>
+								}
 							</div>
 						</div>
 					</td>
@@ -117,7 +125,7 @@
 	<div class="popUp" id="popUp">
 		<section class="d-flex align-items-center">
 			<div class="container">
-				<div class="row justify-content-center form-bg-image" data-background-lg="~/Admin/assets/img/illustrations/signin.svg">
+				<div class="row justify-content-center form-bg-image" data-background-lg="~/Admin/css/assets/img/illustrations/signin.svg">
 					<div class="col-12 d-flex align-items-center justify-content-center">
 						<div class="signin-inner my-3 my-lg-0 bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
 							<div class="text-center text-md-center mb-4 mt-md-0">
@@ -206,7 +214,7 @@
 	<div class="changePopUp" id="changePopUp">
 		<section class=" d-flex align-items-center">
 			<div class="container">
-				<div class="row justify-content-center form-bg-image" data-background-lg="~/Admin/assets/img/illustrations/signin.svg">
+				<div class="row justify-content-center form-bg-image" data-background-lg="~/Admin/css/assets/img/illustrations/signin.svg">
 					<div class="col-12 d-flex align-items-center justify-content-center">
 						<div class="signin-inner my-3 my-lg-0 bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
 							<div class="text-center text-md-center mb-4 mt-md-0">

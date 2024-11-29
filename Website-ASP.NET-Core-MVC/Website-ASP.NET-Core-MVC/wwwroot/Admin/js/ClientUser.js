@@ -228,7 +228,7 @@ function doiEmail() {
     const userId = document.getElementById("matk").value;
     const emailInput = document.getElementById("email"); // Get the input element
     const email = emailInput.value; // Get the input value
-    const emailPattern = /^[a-z0-9._%+-]+@gmail\.com$/i;
+    const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
 
     if (!emailPattern.test(email)) {
         //alert("Email không hợp lệ!");

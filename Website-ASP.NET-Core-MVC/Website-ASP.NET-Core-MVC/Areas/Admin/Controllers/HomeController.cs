@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,SuperAdmin")]
+    [Authorize(Roles = "Admin,SuperAdmin,Sale")]
     public class HomeController : Controller
 	{
         public IActionResult Index()

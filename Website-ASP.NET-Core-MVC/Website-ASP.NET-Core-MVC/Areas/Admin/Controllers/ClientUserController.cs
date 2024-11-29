@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 {
 	[Area("Admin")]
-	[Authorize(Roles = "Admin,SuperAdmin")]
+	[Authorize(Roles = "Admin,SuperAdmin,Sale")]
 	public class ClientUserController : Controller
 	{
 		private readonly ApplicationDbContext _context;
@@ -339,7 +339,8 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 			return Json(new { status = true, message = "Email xác nhận đã được gửi. Hãy kiểm tra hộp thư của bạn !" });
 		}
 
-		[HttpPost]
+		[Authorize(Roles = "Admin,SuperAdmin")]
+        [HttpPost]
 		public async Task<JsonResult> Delete(string id)
 		{
 			try
