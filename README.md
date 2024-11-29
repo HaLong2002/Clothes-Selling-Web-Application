@@ -4,6 +4,13 @@
 
 This project is a web-based e-commerce platform for selling clothes. It is built using **ASP.NET Core MVC** and integrates with **SQL Server** for data management. The application allows users to browse, search, and purchase clothing items, while administrators can manage products, orders, and users.
 
+## Project Team
+
+- [Nguyễn Thành Đạt](https://github.com/datnguyen1012)
+- [Đoàn Quốc Đạt](https://github.com/quocdat09122002)
+- [Lê Thị Trúc Quyên](https://github.com/quyen114)
+- [Trần Thị Hạ Long](https://github.com/HaLong2002)
+
 ## Features
 
 ### Customer Features:
