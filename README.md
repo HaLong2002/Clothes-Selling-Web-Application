@@ -13,6 +13,7 @@ This project is a web-based e-commerce platform for selling clothes. It is built
 - Add items to the shopping cart and place orders.
 - User account management (register, login, update profile).
 - Order history tracking.
+- Email confirmation upon registration.
 
 ### Admin Features:
 
@@ -24,6 +25,7 @@ This project is a web-based e-commerce platform for selling clothes. It is built
 
 - Responsive design for desktop device.
 - Secure authentication and authorization using **ASP.NET Identity**.
+- Email confirmation for new user registrations.
 
 ## Prerequisites
 
@@ -31,6 +33,7 @@ This project is a web-based e-commerce platform for selling clothes. It is built
 - **.NET 9.0 SDK**.
 - **SQL Server** (Express, Developer, or Enterprise edition).
 - **SQL Server Management Studio (SSMS)** (optional, for database management).
+- **Google Account** to send emails via SMTP.
 
 ## Installation Steps
 
@@ -50,12 +53,31 @@ This project is a web-based e-commerce platform for selling clothes. It is built
          "DefaultConnection": "Server=YOUR_SERVER_NAME;Database=YOUR_DATABASE_NAME;Trusted_Connection=True;TrustServerCertificate=True;Connection Timeout=30;MultipleActiveResultSets=True;"
          }
      ```
-4. Apply Migrations
+4. Configure Email Settings
+
+   - Open the `EmailSender.cs` file in **Website-ASP.NET-Core-MVC/Services** folder.
+   - Add the following email configuration to set up **Gmail SMTP**:
+
+     ```
+     var mail = "your-email@gmail.com";
+     var pw = "your-app-password";
+
+     var client = new SmtpClient("smtp.gmail.com", 587)
+     {
+         EnableSsl = true,
+         UseDefaultCredentials = false,
+         Credentials = new NetworkCredential(mail, pw)
+     };
+     ```
+
+     > **Note: Use an App Password for Gmail instead of your main Gmail password. To generate an app password, enable 2-Step Verification on your Google account.**
+
+5. Apply Migrations
    - Open the **Package Manager Console** (Tools > NuGet Package Manager > Package Manager Console).
    - Run the following commands:
      `Update-Database`
      This will create the database and apply all migrations.
-5. Run the Project
+6. Run the Project
    Press `Ctrl + F5` or click on the **Run** button in Visual Studio.
    The application will launch in your default browser.
 
@@ -73,6 +95,7 @@ This project is a web-based e-commerce platform for selling clothes. It is built
 - **Entity Framework Core**: ORM for database operations.
 - **SQL Server**: Relational database management.
 - **Bootstrap**: For responsive front-end design.
+- **MailKit**: For sending emails via SMTP.
 - **jQuery**: For client-side interactivity.
 - **ASP.NET Identity**: For secure authentication and authorization.
 
@@ -95,7 +118,12 @@ This project is a web-based e-commerce platform for selling clothes. It is built
 - Customers can view order history and track their purchases.
 - Admins can manage order status (pending, shipped, completed, canceled).
 
-**3. Authentication and Authorization:**
+**3. Email Confirmation for User Registration**
+
+- When a new user registers, an email is sent with a **confirmation link**.
+- Users must click the link in the email to confirm their account and activate it.
+
+**4. Authentication and Authorization:**
 
 - Secure login and registration.
 - Role-based access (customers, admin, superadmin).
