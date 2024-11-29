@@ -16,14 +16,14 @@ This project is a web-based e-commerce platform for selling clothes. It is built
 
 ### Admin Features:
 
-Manage product catalog (add, edit, delete items).
-View and manage customer orders.
-Manage user accounts.
+- Manage product catalog (add, edit, delete items).
+- View and manage customer orders.
+- Manage user accounts.
 
 ### General Features:
 
-Responsive design for desktop device.
-Secure authentication and authorization using **ASP.NET Identity**.
+- Responsive design for desktop device.
+- Secure authentication and authorization using **ASP.NET Identity**.
 
 ## Prerequisites
 
