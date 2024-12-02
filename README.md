@@ -131,7 +131,7 @@ This project is a web-based e-commerce platform for selling clothes. It is built
 **4. Authentication and Authorization:**
 
 - Secure login and registration.
-- Role-based access (customers, admin, superadmin).
+- Role-based access (customers, sale, admin, superadmin).
 
 ## Troubleshooting
 
