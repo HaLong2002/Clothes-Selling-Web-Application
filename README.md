@@ -20,7 +20,6 @@ This project is a web-based e-commerce platform for selling clothes. It is built
 - Add items to the shopping cart and place orders.
 - User account management (register, login, update profile).
 - Order history tracking.
-- Email confirmation upon registration.
 
 ### Admin Features:
 
@@ -32,7 +31,6 @@ This project is a web-based e-commerce platform for selling clothes. It is built
 
 - Responsive design for desktop device.
 - Secure authentication and authorization using **ASP.NET Identity**.
-- Email confirmation for new user registrations.
 
 ## Prerequisites
 
