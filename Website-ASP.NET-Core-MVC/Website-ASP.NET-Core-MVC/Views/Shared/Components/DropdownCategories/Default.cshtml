@@ -2,5 +2,5 @@
 
 @foreach (var item in Model)
 {
-    <li><a href="@Url.Action("Shop","Product", new { madm = item.MaDM })">@item.TenDanhMuc</a></li>
+    <li><a href="@Url.Action("Shop","Product", new { area = "", madm = item.MaDM })">@item.TenDanhMuc</a></li>
 }

@@ -108,30 +108,34 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
                 var user1 = await _userManager.FindByEmailAsync(info.Principal.FindFirstValue(ClaimTypes.Email));
                 if (user1 != null)
                 {
-                    // Nếu tài khoản đã đăng ký bằng mật khẩu nhưng chưa liên kết với Google
                     var logins = await _userManager.GetLoginsAsync(user1);
-                    if (logins.All(l => l.LoginProvider != info.LoginProvider))
+                    foreach (var login in logins)
                     {
-                        var addLoginResult = await _userManager.AddLoginAsync(user1, info);
-                        if (addLoginResult.Succeeded)
-                        {
-                            _logger.LogInformation("Tài khoản {Email} đã được liên kết với nhà cung cấp {LoginProvider}.", user1.Email, info.LoginProvider);
+                        // Gỡ liên kết cũ
+                        await _userManager.RemoveLoginAsync(user1, login.LoginProvider, login.ProviderKey);
+                    }
 
-                            // Cập nhật EmailConfirmed = true
-                            user1.EmailConfirmed = true;
-                            await _userManager.UpdateAsync(user1);
+                    // Add new external login
+                    var addLoginResult = await _userManager.AddLoginAsync(user1, info);
 
-                            await _signInManager.SignInAsync(user1, isPersistent: true);
-                            return LocalRedirect(returnUrl);
-                        }
-                        else
+                    if (addLoginResult.Succeeded)
+                    {
+                        _logger.LogInformation("Tài khoản {Email} đã được liên kết với nhà cung cấp {LoginProvider}.", user1.Email, info.LoginProvider);
+
+                        // Cập nhật EmailConfirmed = true
+                        user1.EmailConfirmed = true;
+                        await _userManager.UpdateAsync(user1);
+
+                        await _signInManager.SignInAsync(user1, isPersistent: true);
+                        return LocalRedirect(returnUrl);
+                    }
+                    else
+                    {
+                        foreach (var error in addLoginResult.Errors)
                         {
-                            foreach (var error in addLoginResult.Errors)
-                            {
-                                ModelState.AddModelError(string.Empty, error.Description);
-                            }
-                            return Page();
+                            ModelState.AddModelError(string.Empty, error.Description);
                         }
+                        return Page();
                     }
                 }
                 // Nếu tài khoản chưa tồn tại, tạo mới
