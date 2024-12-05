@@ -53,7 +53,7 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
         {
             if (code == null)
             {
-                return BadRequest("Phải cung cấp mã để đặt lại mật khẩu.");
+                return NotFound();
             }
             else
             {
