@@ -56,8 +56,8 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
 			[Display(Name = "Mật khẩu")]
 			public string Password { get; set; }
 
-			[Display(Name = "Nhớ đăng nhập?")]
-			public bool RememberMe { get; set; }
+			//[Display(Name = "Nhớ đăng nhập?")]
+			//public bool RememberMe { get; set; }
 		}
 
 		public async Task OnGetAsync(string returnUrl = null)
@@ -87,7 +87,7 @@ namespace Website_ASP.NET_Core_MVC.Areas.Identity.Pages.Account
 			{
 				var username = Input.Email;
 
-				var result = await _signInManager.PasswordSignInAsync(username, Input.Password, Input.RememberMe, lockoutOnFailure: true);
+				var result = await _signInManager.PasswordSignInAsync(username, Input.Password, true, lockoutOnFailure: true);
 				if (result.Succeeded)
 				{
 					_logger.LogInformation("User logged in.");

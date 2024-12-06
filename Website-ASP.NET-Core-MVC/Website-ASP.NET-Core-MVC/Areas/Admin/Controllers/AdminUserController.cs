@@ -203,6 +203,7 @@ namespace Website_ASP.NET_Core_MVC.Areas.Admin.Controllers
 
 				// Update user properties
 				updateUser.EmailConfirmed = tk.EmailConfirmed;
+				updateUser.FullName = tk.FullName;
 
 				if (tk.LockoutStatus == "Khóa")
 				{
