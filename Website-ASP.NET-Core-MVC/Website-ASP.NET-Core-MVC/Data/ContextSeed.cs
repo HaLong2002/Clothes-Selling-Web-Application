@@ -20,7 +20,7 @@ namespace Website_ASP.NET_Core_MVC.Data
             {
                 UserName = "admin@gmail.com",
                 Email = "admin@gmail.com",
-                FullName = "Admin",
+                FullName = "Quản lý",
                 EmailConfirmed = true,
                 //PhoneNumberConfirmed = true
             };
@@ -42,7 +42,7 @@ namespace Website_ASP.NET_Core_MVC.Data
             {
                 UserName = "superadmin@gmail.com",
                 Email = "superadmin@gmail.com",
-                FullName = "Super Admin",
+                FullName = "Quản trị viên",
                 EmailConfirmed = true,
                 //PhoneNumberConfirmed = true
             };
